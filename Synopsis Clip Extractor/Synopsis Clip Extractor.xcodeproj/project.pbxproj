@@ -13,7 +13,39 @@
 		1BCFBEDC1E1D76700008CB03 /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDA1E1D76700008CB03 /* Document.xib */; };
 		1BCFBEDE1E1D76700008CB03 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */; };
 		1BCFBEE11E1D76700008CB03 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDF1E1D76700008CB03 /* MainMenu.xib */; };
+		1BCFBEF01E1D78E10008CB03 /* Synopsis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */; };
+		1BCFBEF21E1D78F10008CB03 /* Synopsis.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		1BCFBEEC1E1D78B50008CB03 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1BBB10DD1D5542A200C22439;
+			remoteInfo = Synopsis;
+		};
+		1BCFBEEE1E1D78DA0008CB03 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 1BBB10DC1D5542A200C22439;
+			remoteInfo = Synopsis;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1BCFBEF11E1D78EA0008CB03 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1BCFBEF21E1D78F10008CB03 /* Synopsis.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1BCFBECE1E1D76700008CB03 /* Synopsis Clip Extractor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Synopsis Clip Extractor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -26,6 +58,7 @@
 		1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1BCFBEE01E1D76700008CB03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1BCFBEE21E1D76700008CB03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Synopsis-Framework.xcodeproj"; path = "Synopsis Framework/Synopsis/Synopsis-Framework.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -33,6 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BCFBEF01E1D78E10008CB03 /* Synopsis.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +76,7 @@
 		1BCFBEC51E1D76700008CB03 = {
 			isa = PBXGroup;
 			children = (
+				1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */,
 				1BCFBED01E1D76700008CB03 /* Synopsis Clip Extractor */,
 				1BCFBECF1E1D76700008CB03 /* Products */,
 			);
@@ -79,6 +114,14 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		1BCFBEE91E1D78B50008CB03 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -89,10 +132,12 @@
 				1BCFBECA1E1D76700008CB03 /* Sources */,
 				1BCFBECB1E1D76700008CB03 /* Frameworks */,
 				1BCFBECC1E1D76700008CB03 /* Resources */,
+				1BCFBEF11E1D78EA0008CB03 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1BCFBEEF1E1D78DA0008CB03 /* PBXTargetDependency */,
 			);
 			name = "Synopsis Clip Extractor";
 			productName = "Synopsis Clip Extractor";
@@ -125,12 +170,28 @@
 			mainGroup = 1BCFBEC51E1D76700008CB03;
 			productRefGroup = 1BCFBECF1E1D76700008CB03 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 1BCFBEE91E1D78B50008CB03 /* Products */;
+					ProjectRef = 1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1BCFBECD1E1D76700008CB03 /* Synopsis Clip Extractor */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = Synopsis.framework;
+			remoteRef = 1BCFBEEC1E1D78B50008CB03 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1BCFBECC1E1D76700008CB03 /* Resources */ = {
@@ -157,6 +218,14 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1BCFBEEF1E1D78DA0008CB03 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = Synopsis;
+			targetProxy = 1BCFBEEE1E1D78DA0008CB03 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		1BCFBEDA1E1D76700008CB03 /* Document.xib */ = {

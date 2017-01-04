@@ -1,0 +1,3 @@
+[submodule "Synopsis Clip Extractor/Synopsis Framework"]
+	path = Synopsis Clip Extractor/Synopsis Framework
+	url = https://github.com/Synopsis/Synopsis-Framework.git
