@@ -15,6 +15,8 @@
 		1BCFBEE11E1D76700008CB03 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDF1E1D76700008CB03 /* MainMenu.xib */; };
 		1BCFBEF01E1D78E10008CB03 /* Synopsis.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */; };
 		1BCFBEF21E1D78F10008CB03 /* Synopsis.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1BCFBEF61E1D7A8A0008CB03 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */; };
+		1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +61,8 @@
 		1BCFBEE01E1D76700008CB03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		1BCFBEE21E1D76700008CB03 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Synopsis-Framework.xcodeproj"; path = "Synopsis Framework/Synopsis/Synopsis-Framework.xcodeproj"; sourceTree = "<group>"; };
+		1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +70,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BCFBEF61E1D7A8A0008CB03 /* AVFoundation.framework in Frameworks */,
+				1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */,
 				1BCFBEF01E1D78E10008CB03 /* Synopsis.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -79,6 +85,7 @@
 				1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */,
 				1BCFBED01E1D76700008CB03 /* Synopsis Clip Extractor */,
 				1BCFBECF1E1D76700008CB03 /* Products */,
+				1BCFBEF31E1D7A8A0008CB03 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -120,6 +127,15 @@
 				1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		1BCFBEF31E1D7A8A0008CB03 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */,
+				1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

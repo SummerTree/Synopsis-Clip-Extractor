@@ -1,0 +1,37 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "2DD9297ED22CCE385041FFBACECF15573D43055F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "A7A7D73BE0D478A6B7BF50EC87E41BFF64BD43C2" : 9223372036854775807,
+    "2DD9297ED22CCE385041FFBACECF15573D43055F" : 9223372036854775807,
+    "2607E71EBA339476A2AA0374C0A97B6C6DDE7A75" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "B22E7C79-F99B-4CAB-AC6F-8EECBD80143F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "A7A7D73BE0D478A6B7BF50EC87E41BFF64BD43C2" : "Synopsis%20Clip%20Extractor\/Synopsis%20Clip%20Extractor\/Synopsis%20Framework\/Synopsis\/Synopsis\/CIEDE2000\/",
+    "2DD9297ED22CCE385041FFBACECF15573D43055F" : "Synopsis%20Clip%20Extractor\/",
+    "2607E71EBA339476A2AA0374C0A97B6C6DDE7A75" : "Synopsis%20Clip%20Extractor\/Synopsis%20Clip%20Extractor\/Synopsis%20Framework\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Synopsis Clip Extractor",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Synopsis Clip Extractor\/Synopsis Clip Extractor.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Synopsis\/Synopsis-Framework.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2607E71EBA339476A2AA0374C0A97B6C6DDE7A75"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Synopsis\/Synopsis-Clip-Extractor.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "2DD9297ED22CCE385041FFBACECF15573D43055F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Synopsis\/CIEDE2000.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "A7A7D73BE0D478A6B7BF50EC87E41BFF64BD43C2"
+    }
+  ]
+}
