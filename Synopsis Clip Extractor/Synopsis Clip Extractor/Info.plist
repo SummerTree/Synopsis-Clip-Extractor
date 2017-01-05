@@ -28,17 +28,6 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>mov</string>
-			</array>
-			<key>CFBundleTypeName</key>
-			<string>Quicktime Movie</string>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>NSDocumentClass</key>
-			<string>Document</string>
-		</dict>
-		<dict>
-			<key>CFBundleTypeExtensions</key>
-			<array>
 				<string>mp4</string>
 			</array>
 			<key>CFBundleTypeName</key>

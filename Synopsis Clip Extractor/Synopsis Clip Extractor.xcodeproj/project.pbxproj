@@ -17,6 +17,7 @@
 		1BCFBEF21E1D78F10008CB03 /* Synopsis.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 1BCFBEED1E1D78B50008CB03 /* Synopsis.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1BCFBEF61E1D7A8A0008CB03 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */; };
 		1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */; };
+		1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,8 @@
 		1BCFBEE81E1D78B50008CB03 /* Synopsis-Framework.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "Synopsis-Framework.xcodeproj"; path = "Synopsis Framework/Synopsis/Synopsis-Framework.xcodeproj"; sourceTree = "<group>"; };
 		1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
+		1BCFBEFC1E1DC1D80008CB03 /* KeyframeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeView.h; sourceTree = "<group>"; };
+		1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyframeView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +107,7 @@
 				1BCFBED21E1D76700008CB03 /* AppDelegate.m */,
 				1BCFBED71E1D76700008CB03 /* Document.h */,
 				1BCFBED81E1D76700008CB03 /* Document.m */,
+				1BCFBEFB1E1DC1B00008CB03 /* UI */,
 				1BCFBEDA1E1D76700008CB03 /* Document.xib */,
 				1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */,
 				1BCFBEDF1E1D76700008CB03 /* MainMenu.xib */,
@@ -136,6 +140,15 @@
 				1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1BCFBEFB1E1DC1B00008CB03 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				1BCFBEFC1E1DC1D80008CB03 /* KeyframeView.h */,
+				1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */,
+			);
+			name = UI;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -227,6 +240,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */,
 				1BCFBED91E1D76700008CB03 /* Document.m in Sources */,
 				1BCFBED61E1D76700008CB03 /* main.m in Sources */,
 				1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */,
@@ -355,6 +369,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "Synopsis Clip Extractor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.synopsis.Synopsis-Clip-Extractor";
@@ -367,6 +382,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				GCC_OPTIMIZATION_LEVEL = 3;
+				GCC_UNROLL_LOOPS = YES;
 				INFOPLIST_FILE = "Synopsis Clip Extractor/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "info.synopsis.Synopsis-Clip-Extractor";
