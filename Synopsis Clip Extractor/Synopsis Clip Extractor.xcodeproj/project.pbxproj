@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED21E1D76700008CB03 /* AppDelegate.m */; };
 		1BCFBED61E1D76700008CB03 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED51E1D76700008CB03 /* main.m */; };
-		1BCFBED91E1D76700008CB03 /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED81E1D76700008CB03 /* Document.m */; };
+		1BCFBED91E1D76700008CB03 /* Document.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED81E1D76700008CB03 /* Document.mm */; };
 		1BCFBEDC1E1D76700008CB03 /* Document.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDA1E1D76700008CB03 /* Document.xib */; };
 		1BCFBEDE1E1D76700008CB03 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */; };
 		1BCFBEE11E1D76700008CB03 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFBEDF1E1D76700008CB03 /* MainMenu.xib */; };
@@ -18,6 +18,7 @@
 		1BCFBEF61E1D7A8A0008CB03 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */; };
 		1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */; };
 		1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */; };
+		1BCFBF001E1F07010008CB03 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEFF1E1F07010008CB03 /* libstdc++.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +57,7 @@
 		1BCFBED21E1D76700008CB03 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		1BCFBED51E1D76700008CB03 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		1BCFBED71E1D76700008CB03 /* Document.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Document.h; sourceTree = "<group>"; };
-		1BCFBED81E1D76700008CB03 /* Document.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Document.m; sourceTree = "<group>"; };
+		1BCFBED81E1D76700008CB03 /* Document.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Document.mm; sourceTree = "<group>"; };
 		1BCFBEDB1E1D76700008CB03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/Document.xib; sourceTree = "<group>"; };
 		1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1BCFBEE01E1D76700008CB03 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
@@ -66,6 +67,7 @@
 		1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		1BCFBEFC1E1DC1D80008CB03 /* KeyframeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeView.h; sourceTree = "<group>"; };
 		1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyframeView.m; sourceTree = "<group>"; };
+		1BCFBEFF1E1F07010008CB03 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +75,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1BCFBF001E1F07010008CB03 /* libstdc++.tbd in Frameworks */,
 				1BCFBEF61E1D7A8A0008CB03 /* AVFoundation.framework in Frameworks */,
 				1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */,
 				1BCFBEF01E1D78E10008CB03 /* Synopsis.framework in Frameworks */,
@@ -106,7 +109,7 @@
 				1BCFBED11E1D76700008CB03 /* AppDelegate.h */,
 				1BCFBED21E1D76700008CB03 /* AppDelegate.m */,
 				1BCFBED71E1D76700008CB03 /* Document.h */,
-				1BCFBED81E1D76700008CB03 /* Document.m */,
+				1BCFBED81E1D76700008CB03 /* Document.mm */,
 				1BCFBEFB1E1DC1B00008CB03 /* UI */,
 				1BCFBEDA1E1D76700008CB03 /* Document.xib */,
 				1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */,
@@ -136,6 +139,7 @@
 		1BCFBEF31E1D7A8A0008CB03 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1BCFBEFF1E1F07010008CB03 /* libstdc++.tbd */,
 				1BCFBEF41E1D7A8A0008CB03 /* AVFoundation.framework */,
 				1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */,
 			);
@@ -241,7 +245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */,
-				1BCFBED91E1D76700008CB03 /* Document.m in Sources */,
+				1BCFBED91E1D76700008CB03 /* Document.mm in Sources */,
 				1BCFBED61E1D76700008CB03 /* main.m in Sources */,
 				1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */,
 			);
