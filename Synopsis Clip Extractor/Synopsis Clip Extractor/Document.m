@@ -244,7 +244,7 @@
                         // Lock access to our parsedJSonBatch array so we can mutate it on parallel threads
                         NSLock* lock = [[NSLock alloc] init];
                         
-                        for(NSUInteger proc = 0; proc < processors; processors++)
+                        for(NSUInteger proc = 0; proc < processors; proc++)
                         {
                             NSData* json = CFBridgingRelease(CMSimpleQueueDequeue(decompressedMetadataQueue));
                             
