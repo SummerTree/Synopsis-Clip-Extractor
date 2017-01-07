@@ -111,9 +111,9 @@
     return self;
 }
 
-- (void) showWindows
+- (void)windowControllerDidLoadNib:(NSWindowController *)windowController;
 {
-    [super showWindows];
+    [super windowControllerDidLoadNib:windowController];
     
     self.keyframeView.enclosingScrollView.hasVerticalScroller = NO;
     self.keyframeView.enclosingScrollView.hasHorizontalScroller = YES;

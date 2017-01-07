@@ -36,9 +36,8 @@
 - (void) magnifyWithEvent:(NSEvent *)event
 {
     self.magnification += event.magnification;
-    self.magnification = MAX(0.1, self.magnification);
+    self.magnification = MAX(0.001, self.magnification);
     self.magnification = MIN(10, self.magnification);
-    
     
     [self recalculateUnits];
     
@@ -60,10 +59,13 @@
 
 - (void) setFrameFromDuration:(CMTime)duration andFrameDuration:(CMTime)frameDuration
 {
+    if(CMTIME_IS_VALID(frameDuration) && CMTIME_IS_VALID(duration))
+    {
     self.frameDuration = frameDuration;
     self.duration = duration;
     
     [self recalculateUnits];
+    }
 }
 
 - (void) recalculateUnits
@@ -94,7 +96,10 @@
 
     [self getRectsBeingDrawn:&rects count:&count];
     
-    // Unit
+    // Unit calculations
+    CGFloat second = self.frameDurationInPixels * self.frameDuration.value;
+    CGFloat minute = second * 60.0;
+    CGFloat hour = minute * 60.0;
     
     for(NSInteger i = 0; i < count; i++)
     {
@@ -106,27 +111,114 @@
         for(NSUInteger i = 0; i < clippedDirtyRect.size.width + self.frameDurationInPixels; i ++)
         {
             
-            // Draw tick Boundaries
-            [[NSColor blackColor] setStroke];
-            if( i % (int)round(self.frameTickInPixels) == 0)
+            if(self.magnification >= 2.0)
             {
-                CGFloat x = i - fmod(self.scrollOrigin, self.frameTickInPixels);
+                // Draw tick Boundaries
+                [[NSColor blackColor] setStroke];
+                if( i % (int)round(self.frameTickInPixels) == 0)
+                {
+                    CGFloat x = i - fmod(self.scrollOrigin, self.frameTickInPixels);
+                    
+                    if(x  >= self.totalDurationInPixels)
+                        break;
+                    
+                    NSPoint p1 = NSMakePoint(x, self.bounds.size.height);
+                    NSPoint p2 = NSMakePoint(x, self.bounds.size.height * 0.9);
+                    
+                    [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
+                }
+            }
+            
+            if(self.magnification >= 0.25)
+            {
+                // Draw Frame Boundaries
+                [[NSColor lightGrayColor] setStroke];
+                [[NSColor lightGrayColor] setFill];
+                if( i % (int)round(self.frameDurationInPixels) == 0)
+                {
+                    CGFloat x = i - fmod(self.scrollOrigin, self.frameDurationInPixels);
+                    
+                    if(x  >= self.totalDurationInPixels)
+                        break;
+                    
+                    NSPoint p1 = NSMakePoint(x, self.bounds.size.height);
+                    NSPoint p2 = NSMakePoint(x, self.bounds.size.height * 0.8);
+                    
+                    [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
+                    
+                    if(self.magnification >= 1.5)
+                    {
+                    NSString* label = [NSString stringWithFormat:@"f %i", (int)round((x + self.scrollOrigin)/self.frameDurationInPixels) ];
+                    
+                    CGContextSetLineWidth(context, 2.0);
+                    CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
+                    CGContextSetCharacterSpacing(context, 1.7);
+                    CGContextSetTextDrawingMode(context, kCGTextFill);
+                    CGContextShowTextAtPoint(context, p1.x, p2.y -10, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
+                    }
+                }
+            }
+            
+            // Draw Second Boundaries
+            if(self.magnification >= 0.01)
+            {
+                [[NSColor yellowColor] setStroke];
+                [[NSColor yellowColor] setFill];
+                if( i % (int)round(second) == 0)
+                {
+                    CGFloat x = i - fmod(self.scrollOrigin, second );
+                    
+                    if(x  >= self.totalDurationInPixels)
+                        break;
+                    
+                    NSPoint p1 = NSMakePoint(x, self.bounds.size.height);
+                    NSPoint p2 = NSMakePoint(x, self.bounds.size.height * 0.7);
+                    
+                    [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
+                    
+                    if(self.magnification >= 0.05)
+                    {
+                        NSString* label = [NSString stringWithFormat:@"s %i", (int)round((x + self.scrollOrigin)/(second)) ];
+                        
+                        CGContextSetLineWidth(context, 2.0);
+                        CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
+                        CGContextSetCharacterSpacing(context, 1.7);
+                        CGContextSetTextDrawingMode(context, kCGTextFill);
+                        CGContextShowTextAtPoint(context, p1.x, p2.y - 10, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
+                    }
+                }
+            }
+
+            // Draw Minute Boundaries
+            [[NSColor redColor] setStroke];
+            [[NSColor redColor] setFill];
+            if( i % (int)round(minute) == 0)
+            {
+                CGFloat x = i - fmod(self.scrollOrigin, minute );
                 
                 if(x  >= self.totalDurationInPixels)
                     break;
                 
                 NSPoint p1 = NSMakePoint(x, self.bounds.size.height);
-                NSPoint p2 = NSMakePoint(x, self.bounds.size.height * 0.75);
+                NSPoint p2 = NSMakePoint(x, self.bounds.size.height * 0.6);
                 
                 [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
+                
+                NSString* label = [NSString stringWithFormat:@"m %i", (int)round((x + self.scrollOrigin)/(minute)) ];
+                
+                CGContextSetLineWidth(context, 2.0);
+                CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
+                CGContextSetCharacterSpacing(context, 1.7);
+                CGContextSetTextDrawingMode(context, kCGTextFill);
+                CGContextShowTextAtPoint(context, p1.x, p2.y - 10, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
             }
-            
-            // Draw Frame Boundaries
-            [[NSColor lightGrayColor] setStroke];
-            [[NSColor lightGrayColor] setFill];
-            if( i % (int)round(self.frameDurationInPixels) == 0)
+
+            // Draw Hour Boundaries
+            [[NSColor greenColor] setStroke];
+            [[NSColor greenColor] setFill];
+            if( i % (int)round(hour) == 0)
             {
-                CGFloat x = i - fmod(self.scrollOrigin, self.frameDurationInPixels);
+                CGFloat x = i - fmod(self.scrollOrigin, hour );
                 
                 if(x  >= self.totalDurationInPixels)
                     break;
@@ -136,38 +228,13 @@
                 
                 [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
                 
-                NSString* label = [NSString stringWithFormat:@"f %i", (int)round((x + self.scrollOrigin)/self.frameTickInPixels) ];
+                NSString* label = [NSString stringWithFormat:@"h %i", (int)round((x + self.scrollOrigin)/(hour)) ];
                 
                 CGContextSetLineWidth(context, 2.0);
                 CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
                 CGContextSetCharacterSpacing(context, 1.7);
                 CGContextSetTextDrawingMode(context, kCGTextFill);
-                CGContextShowTextAtPoint(context, p1.x, p2.y -10, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
-            }
-            
-            // Draw Second Boundaries
-            [[NSColor yellowColor] setStroke];
-            [[NSColor yellowColor] setFill];
-            if( i % (int)round(self.frameDurationInPixels * self.frameDuration.value) == 0)
-            {
-                CGFloat x = i - fmod(self.scrollOrigin, self.frameDurationInPixels * self.frameDuration.value );
-                
-                if(x  >= self.totalDurationInPixels)
-                    break;
-                
-                NSPoint p1 = NSMakePoint(x, 0);
-                NSPoint p2 = NSMakePoint(x, self.bounds.size.height);
-                
-                [NSBezierPath strokeLineFromPoint:p1 toPoint:p2];
-                
-                
-                NSString* label = [NSString stringWithFormat:@"s %i", (int)round((x + self.scrollOrigin)/self.frameTickInPixels) ];
-                
-                CGContextSetLineWidth(context, 2.0);
-                CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
-                CGContextSetCharacterSpacing(context, 1.7);
-                CGContextSetTextDrawingMode(context, kCGTextFill);
-                CGContextShowTextAtPoint(context, p1.x, p2.y * 0.25 - 4, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
+                CGContextShowTextAtPoint(context, p1.x, p2.y - 10, [label cStringUsingEncoding:NSASCIIStringEncoding], label.length);
             }
 
             
