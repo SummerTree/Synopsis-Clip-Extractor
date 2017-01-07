@@ -7,7 +7,12 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import <CoreMedia/CoreMedia.h>
 
 @interface KeyframeView : NSView
+
+- (void) setFrameFromDuration:(CMTime)duration andFrameDuration:(CMTime)frameDuration;
+
+@property (copy) NSArray* editPoints;
 
 @end

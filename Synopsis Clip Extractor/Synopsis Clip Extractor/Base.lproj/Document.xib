@@ -23,9 +23,9 @@
                 <rect key="frame" x="0.0" y="0.0" width="507" height="413"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pyX-8X-X6A">
-                        <rect key="frame" x="0.0" y="0.0" width="507" height="131"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MOf-qc-qLj" customClass="KeyframeView">
+                        <rect key="frame" x="0.0" y="0.0" width="507" height="130"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     </customView>
                 </subviews>
             </view>

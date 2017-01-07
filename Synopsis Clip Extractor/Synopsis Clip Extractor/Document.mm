@@ -10,12 +10,15 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Synopsis/Synopsis.h>
 #import <Synopsis/GZIP.h>
+#import "KeyframeView.h"
 
 @interface Document ()
 {
     CMSimpleQueueRef compressedMetadataQueue;
     CMSimpleQueueRef jsonMetadataQueue;
 }
+
+@property (weak) IBOutlet KeyframeView* keyframeView;
 
 @property (strong) AVURLAsset* clipAsset;
 @property (strong) AVAssetReader* clipAssetReader;
@@ -48,7 +51,7 @@
     self = [super init];
     if (self) {
         // Add your subclass-specific initialization here.
-        int32_t capacity = 512;
+        int32_t capacity = 64;
         
         CMSimpleQueueCreate(kCFAllocatorDefault, capacity, &compressedMetadataQueue);
         CMSimpleQueueCreate(kCFAllocatorDefault, capacity, &jsonMetadataQueue);
@@ -103,38 +106,55 @@
         self.clipAsset = [AVURLAsset assetWithURL:url];
         
         self.clipAssetReader = [AVAssetReader assetReaderWithAsset:self.clipAsset error:nil];
-        
-        AVAssetTrack* assetTrack = [self.clipAsset tracksWithMediaType:AVMediaTypeMetadata][0];
-        
-        if(assetTrack)
-        {
-            self.clipAssetReaderTrackOutput = [ AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:assetTrack outputSettings:nil];
-            
-            self.clipAssetReaderTrackOutput.alwaysCopiesSampleData = NO;
-            
-            self.clipAssetReaderMetadataAdaptor = [AVAssetReaderOutputMetadataAdaptor assetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput:self.clipAssetReaderTrackOutput];
-            
-            if([self.clipAssetReader canAddOutput:self.clipAssetReaderTrackOutput])
-            {
-                [self.clipAssetReader addOutput:self.clipAssetReaderTrackOutput];
-            }
-            
-            [self.clipAssetReaderTrackOutput markConfigurationAsFinal];
-            
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-                @autoreleasepool {
-                    [self readOnBackgroundQueue];
-                }
-            });
-        }
     }
 
     return self;
 }
 
+- (void) showWindows
+{
+    [super showWindows];
+    
+    self.keyframeView.enclosingScrollView.hasVerticalScroller = NO;
+    self.keyframeView.enclosingScrollView.hasHorizontalScroller = YES;
+        
+    AVAssetTrack* videoAssetTrack = [self.clipAsset tracksWithMediaType:AVMediaTypeVideo][0];
+    AVAssetTrack* metadataAssetTrack = [self.clipAsset tracksWithMediaType:AVMediaTypeMetadata][0];
+    
+    CMTime duration = metadataAssetTrack.timeRange.duration;
+    CMTime frameDuration = metadataAssetTrack.minFrameDuration;
+    
+    [self.keyframeView setFrameFromDuration:duration andFrameDuration:frameDuration];
+    
+    if(metadataAssetTrack)
+    {
+        self.clipAssetReaderTrackOutput = [ AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:metadataAssetTrack outputSettings:nil];
+        
+        self.clipAssetReaderTrackOutput.alwaysCopiesSampleData = NO;
+        
+        self.clipAssetReaderMetadataAdaptor = [AVAssetReaderOutputMetadataAdaptor assetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput:self.clipAssetReaderTrackOutput];
+        
+        if([self.clipAssetReader canAddOutput:self.clipAssetReaderTrackOutput])
+        {
+            [self.clipAssetReader addOutput:self.clipAssetReaderTrackOutput];
+        }
+        
+        [self.clipAssetReaderTrackOutput markConfigurationAsFinal];
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            @autoreleasepool {
+                [self readOnBackgroundQueue];
+            }
+        });
+    }
+
+}
+
 - (void) readOnBackgroundQueue
 {
     [self.clipAssetReader startReading];
+    
+    __weak typeof (self) weakSelf = self;
     
     dispatch_group_t pipelineGroup = dispatch_group_create();
     
@@ -143,14 +163,13 @@
     __block BOOL finishedParsing = NO;
     __block BOOL finishedCalculating = NO;
     
-    useconds_t sleepTime = 2;
-    // TODO: Fix self capture
+    useconds_t sleepTime = 1000;
     
     // Read Thread
     dispatch_group_enter(pipelineGroup);
-    dispatch_async(self.backgroundReadQueue, ^{
+    dispatch_async(weakSelf.backgroundReadQueue, ^{
         
-        while(self.clipAssetReader.status == AVAssetReaderStatusReading )
+        while(weakSelf.clipAssetReader.status == AVAssetReaderStatusReading )
         {
             @autoreleasepool
             {
@@ -162,7 +181,7 @@
                     continue;
                 }
                 
-                AVTimedMetadataGroup* timedMetadata = [self.clipAssetReaderMetadataAdaptor nextTimedMetadataGroup];
+                AVTimedMetadataGroup* timedMetadata = [weakSelf.clipAssetReaderMetadataAdaptor nextTimedMetadataGroup];
                 if(timedMetadata)
                 {
                     for(AVMetadataItem* metadataItem in timedMetadata.items)
@@ -187,15 +206,16 @@
         }
     });
 
-    // Parse Zipped Data to JSON on background queue
-    NSUInteger batchCount = [NSProcessInfo processInfo].processorCount;
-    NSLock* batchLock = [[NSLock alloc] init];
-    NSMutableArray* batchCache = [NSMutableArray arrayWithCapacity:batchCount];
-    dispatch_group_t batchGroup = dispatch_group_create();
     
     dispatch_group_enter(pipelineGroup);
-    dispatch_async(self.backgroundJSONParseQueue, ^{
-        
+    dispatch_async(weakSelf.backgroundJSONParseQueue, ^{
+
+        // Parse Zipped Data to JSON on background queue
+        NSUInteger batchCount = [NSProcessInfo processInfo].processorCount;
+        NSLock* batchLock = [[NSLock alloc] init];
+        NSMutableArray* batchCache = [NSMutableArray arrayWithCapacity:batchCount];
+        dispatch_group_t batchGroup = dispatch_group_create();
+
         while( ! finishedReading )
         {
             @autoreleasepool
@@ -208,9 +228,8 @@
                     continue;
                 }
                 
-                [batchCache removeAllObjects];
-                
                 // Parallelize unzip and json parsing
+                __block int dataCount = 0;
                 for(int i = 0; i < batchCount; i++)
                 {
                     CFDataRef data = (CFDataRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
@@ -231,7 +250,10 @@
                                     
                                     if(frameMetadata)
                                     {
+                                        // TODO: FIX ORDERING HERE:
                                         [batchLock lock];
+                                        dataCount++;
+//                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
                                         [batchCache addObject:frameMetadata];
                                         [batchLock unlock];
                                     }
@@ -248,13 +270,25 @@
 
                 [batchLock lock];
 
-                for(NSDictionary* frameMetadata in batchCache)
+                for(int i = 0; i < batchCache.count; i++)
                 {
-                    CMSimpleQueueEnqueue(jsonMetadataQueue, CFBridgingRetain(frameMetadata));
-                }
+                    NSDictionary* frameMetadata = batchCache[i];
+                    
+                    if(frameMetadata)
+                    {
+                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
+                            @autoreleasepool {
+                                [weakSelf calculateFromMetadata:frameMetadata];
+                            }
+                        });
 
-                [batchLock unlock];
+                        frameMetadata = nil;
+                    }
+                }
                 
+                [batchCache removeAllObjects];
+//                batchCache = [NSMutableArray arrayWithCapacity:batchCount];
+                [batchLock unlock];
             }
         }
         
@@ -281,8 +315,14 @@
                     
                     if(frameMetadata)
                     {
-                        CMSimpleQueueEnqueue(jsonMetadataQueue, CFBridgingRetain(frameMetadata));
+                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
+                            @autoreleasepool {
+                                [weakSelf calculateFromMetadata:frameMetadata];
+                            }
+                        });
                     }
+                    
+                    frameMetadata = nil;
                 }
                 CFRelease(data);
             }
@@ -292,72 +332,9 @@
         dispatch_group_leave(pipelineGroup);
     });
     
-//     Test
-//    
-//    dispatch_group_enter(pipelineGroup);
-//    dispatch_async(self.self.backgroundCalculateQueue, ^{
-//        
-//        while( ! finishedParsing )
-//        {
-//            @autoreleasepool
-//            {
-//                CFDictionaryRef frameMetadata = (CMSimpleQueueDequeue(jsonMetadataQueue));
-//                if(frameMetadata)
-//                    CFRelease(frameMetadata);
-//            }
-//        }
-//        
-//        finishedCalculating = YES;
-//        dispatch_group_leave(pipelineGroup);
-//        
-//    });
-
-//     End Test
-    
-    // Calculate frame delta's from Raw JSON Queue
-    dispatch_group_enter(pipelineGroup);
-    
-    __weak typeof (self) weakSelf = self;
-    
-    dispatch_async(self.backgroundCalculateQueue, ^{
-        
-//        __strong typeof (weakSelf) strongSelf = weakSelf;
-
-        while( ! finishedParsing )
-        {
-            @autoreleasepool
-            {
-                CFDictionaryRef frameMetadata = (CFDictionaryRef)(CMSimpleQueueDequeue(jsonMetadataQueue));
-                
-                if(frameMetadata)
-                {
-                    [weakSelf calculateFromMetadata:(__bridge NSDictionary *)(frameMetadata)];
-                    CFRelease(frameMetadata);
-                }
-            }
-        }
-        
-        // unwind anything left in the SimpleQueue
-        while(  CMSimpleQueueGetCount(jsonMetadataQueue) > 0 )
-        {
-            CFDictionaryRef frameMetadata = (CFDictionaryRef)(CMSimpleQueueDequeue(jsonMetadataQueue));
-            
-            if(frameMetadata)
-            {
-                [weakSelf calculateFromMetadata:(__bridge NSDictionary *)(frameMetadata)];
-                CFRelease(frameMetadata);
-            }
-        }
-        
-        finishedCalculating = YES;
-        dispatch_group_leave(pipelineGroup);
-    });
-    
-    // Wait on our semaphore
     
     dispatch_group_wait(pipelineGroup, DISPATCH_TIME_FOREVER);
     NSLog(@"Finished");
-
 }
 
 - (void) calculateFromMetadata:(NSDictionary*)frameMetadata
@@ -367,58 +344,58 @@
     NSArray* histogram = [standard objectForKey:kSynopsisStandardMetadataHistogramDictKey];
     NSString* hash = [standard objectForKey:kSynopsisStandardMetadataPerceptualHashDictKey];
     
-    float comparedHistograms = 0.0;
-    float comparedFeatures = 0.0;
-    float comparedHashes = 0.0;
+    __block float comparedHistograms = 0.0;
+    __block float comparedFeatures = 0.0;
+    __block float comparedHashes = 0.0;
     
     // Parallelize calculations:
-//    dispatch_group_t calcGroup = dispatch_group_create();
+    dispatch_group_t calcGroup = dispatch_group_create();
     
     if(self.lastFeatureVector && self.lastFeatureVector.count && featureVector.count && (self.lastFeatureVector.count == featureVector.count))
     {
-//        dispatch_group_enter(calcGroup);
-//        
-//        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-//            
-//            @autoreleasepool
-//            {
+        dispatch_group_enter(calcGroup);
+        
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            
+            @autoreleasepool
+            {
                 comparedFeatures = compareFeatureVector(self.lastFeatureVector, featureVector);
-//                dispatch_group_leave(calcGroup);
-//            }
-//
-//        });
+                dispatch_group_leave(calcGroup);
+            }
+
+        });
     }
     
     if(self.lastHistogram && histogram)
     {
-//        dispatch_group_enter(calcGroup);
-//        
-//        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-//            
-//            @autoreleasepool
-//            {
+        dispatch_group_enter(calcGroup);
+        
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            
+            @autoreleasepool
+            {
                 comparedHistograms = compareHistogtams(self.lastHistogram, histogram);
-//                dispatch_group_leave(calcGroup);
-//            }
-//        });
+                dispatch_group_leave(calcGroup);
+            }
+        });
     }
     
     if(self.lastHash && hash)
     {
-//        dispatch_group_enter(calcGroup);
-//        
-//        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-//            
-//            @autoreleasepool
-//            {
+        dispatch_group_enter(calcGroup);
+        
+        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
+            
+            @autoreleasepool
+            {
                 comparedHashes = compareFrameHashes(self.lastHash, hash);
-//                dispatch_group_leave(calcGroup);
-//            }
-//        });
+                dispatch_group_leave(calcGroup);
+            }
+        });
     }
     
     // Sync threads
-//    dispatch_group_wait(calcGroup, DISPATCH_TIME_FOREVER);
+    dispatch_group_wait(calcGroup, DISPATCH_TIME_FOREVER);
     
     //                                if(lastComparedFeatures)
     {
@@ -437,17 +414,24 @@
     //                                              comparedFeatures, deriviativeFeature,
     //                                              comparedHistograms, deriviativeHistogram,
     //                                              comparedHashes, deriviativeHash);
+    
     self.lastFeatureVector = nil;
     self.lastHistogram = nil;
     self.lastHash = nil;
         
-    self.lastFeatureVector = [featureVector copy];
-    self.lastHistogram = [histogram copy];
-    self.lastHash = [hash copy];
-    
+    self.lastFeatureVector =  featureVector;//[featureVector copy];
+    self.lastHistogram = histogram ;
+    self.lastHash = hash;
+
     self.lastComparedFeatures = comparedFeatures;
     self.lastComparedHistograms = comparedHistograms;
     self.lastcomparedHash = comparedHashes;
+    
+    featureVector = nil;
+    histogram = nil;
+    hash = nil;
+    standard = nil;
+    frameMetadata = nil;
 }
 
 - (id) decodeSynopsisMetadataItem:(AVMetadataItem*)metadataItem
