@@ -19,6 +19,7 @@
 		1BCFBEF71E1D7A8B0008CB03 /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEF51E1D7A8A0008CB03 /* CoreMedia.framework */; };
 		1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */; };
 		1BCFBF001E1F07010008CB03 /* libstdc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1BCFBEFF1E1F07010008CB03 /* libstdc++.tbd */; };
+		1BCFBF091E2180E70008CB03 /* TimelineView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBF081E2180E70008CB03 /* TimelineView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +69,8 @@
 		1BCFBEFC1E1DC1D80008CB03 /* KeyframeView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeView.h; sourceTree = "<group>"; };
 		1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyframeView.m; sourceTree = "<group>"; };
 		1BCFBEFF1E1F07010008CB03 /* libstdc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libstdc++.tbd"; path = "usr/lib/libstdc++.tbd"; sourceTree = SDKROOT; };
+		1BCFBF071E2180E70008CB03 /* TimelineView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineView.h; sourceTree = "<group>"; };
+		1BCFBF081E2180E70008CB03 /* TimelineView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +154,8 @@
 			children = (
 				1BCFBEFC1E1DC1D80008CB03 /* KeyframeView.h */,
 				1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */,
+				1BCFBF071E2180E70008CB03 /* TimelineView.h */,
+				1BCFBF081E2180E70008CB03 /* TimelineView.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -247,6 +252,7 @@
 				1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */,
 				1BCFBED91E1D76700008CB03 /* Document.mm in Sources */,
 				1BCFBED61E1D76700008CB03 /* main.m in Sources */,
+				1BCFBF091E2180E70008CB03 /* TimelineView.m in Sources */,
 				1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -11,6 +11,7 @@
 #import <Synopsis/Synopsis.h>
 #import <Synopsis/GZIP.h>
 #import "KeyframeView.h"
+#import "TimelineView.h"
 
 @interface Document ()
 {
@@ -19,6 +20,7 @@
 }
 
 @property (weak) IBOutlet KeyframeView* keyframeView;
+@property (weak) IBOutlet TimelineView* timelineView;
 
 @property (strong) AVURLAsset* clipAsset;
 @property (strong) AVAssetReader* clipAssetReader;
@@ -115,9 +117,6 @@
 {
     [super windowControllerDidLoadNib:windowController];
     
-    self.keyframeView.enclosingScrollView.hasVerticalScroller = NO;
-    self.keyframeView.enclosingScrollView.hasHorizontalScroller = YES;
-        
     AVAssetTrack* videoAssetTrack = [self.clipAsset tracksWithMediaType:AVMediaTypeVideo][0];
     AVAssetTrack* metadataAssetTrack = [self.clipAsset tracksWithMediaType:AVMediaTypeMetadata][0];
     
@@ -125,6 +124,7 @@
     CMTime frameDuration = metadataAssetTrack.minFrameDuration;
     
     [self.keyframeView setFrameFromDuration:duration andFrameDuration:frameDuration];
+    [self.timelineView setFrameFromDuration:duration andFrameDuration:frameDuration];
     
     if(metadataAssetTrack)
     {
@@ -276,11 +276,11 @@
                     
                     if(frameMetadata)
                     {
-                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
-                            @autoreleasepool {
+//                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
+//                            @autoreleasepool {
                                 [weakSelf calculateFromMetadata:frameMetadata];
-                            }
-                        });
+//                            }
+//                        });
 
                         frameMetadata = nil;
                     }
@@ -315,11 +315,11 @@
                     
                     if(frameMetadata)
                     {
-                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
-                            @autoreleasepool {
+//                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
+//                            @autoreleasepool {
                                 [weakSelf calculateFromMetadata:frameMetadata];
-                            }
-                        });
+//                            }
+//                        });
                     }
                     
                     frameMetadata = nil;
