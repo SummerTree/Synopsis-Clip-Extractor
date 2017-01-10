@@ -57,7 +57,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 
 - (void) awakeFromNib
 {
-    self.duration = CMTimeMakeWithSeconds(60 * 5, 600);
+    self.duration = CMTimeMakeWithSeconds(60 * 120, 600);
     self.frameDuration = CMTimeMake(1,30);
     self.magnification = 1.0;
     
@@ -89,9 +89,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     self.magnification = MAX(0.001, self.magnification);
     self.magnification = MIN(10, self.magnification);
     
-    //    NSPoint pointInView = [self convertPoint:event.locationInWindow fromView:nil];
-    //    NSLog(@"pointInView: %f", pointInView.x );
-    //    [self updateScrollOrigin: ( -pointInView.x )];
+    NSLog(@"magnification: %f", self.magnification );
     
     [self recalculateUnits];
     
@@ -160,6 +158,11 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     
     [self getRectsBeingDrawn:&rects count:&count];
     
+    CGFloat frameDurationInMS = CMTimeGetSeconds(self.frameDuration) * 1000.0;
+    NSUInteger numSeconds = floor(CMTimeGetSeconds(self.duration));
+    NSUInteger numMinutes = floor(numSeconds/60.0);
+    NSUInteger numHours = floor(numMinutes/60.0);
+
     // Unit calculations
     for(NSInteger i = 0; i < count; i++)
     {
@@ -171,53 +174,95 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         CGContextFillRect(context, clippedDirtyRect);
         
         // Draw Frames
-        for(int i = 0; i < self.numFrames; i++)
+        if(self.magnification < 0.07)
         {
-//            CGFloat frame = i
-            float screenX = [self millisToScreenX:(i * CMTimeGetSeconds(self.frameDuration) * 1000.0)];
-            if(screenX > clippedDirtyRect.origin.x && screenX < clippedDirtyRect.size.width)
+            for(int i = 0; i < self.numFrames; i++)
             {
-                [[NSColor lightGrayColor] setFill];
-                [[NSColor lightGrayColor] setStroke];
+                float screenX = [self millisToScreenX:(i * frameDurationInMS)];
+                if([self coord:screenX inRect:clippedDirtyRect])
+                {
+                    [[NSColor lightGrayColor] setFill];
+                    [[NSColor lightGrayColor] setStroke];
 
-                CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
-                
-                [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                    CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
+                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
+                    
+                    [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                    if(self.magnification < 0.07/15.0)
+                        [self drawLabel:i atPoint:bottom inContext:context];
+                }
             }
         }
         
-        for(int i = 0; i < floor(CMTimeGetSeconds(self.duration)); i++)
+        if(self.magnification < 0.5)
         {
-            float screenX = [self millisToScreenX:(i * 1000.0)];
-            if(screenX > clippedDirtyRect.origin.x && screenX < clippedDirtyRect.size.width)
+            for(int i = 0; i < numSeconds; i++)
             {
-                [[NSColor yellowColor] setFill];
-                [[NSColor yellowColor] setStroke];
-                
-                CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.8);
-                
-                [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                float screenX = [self millisToScreenX:(i * 1000.0)];
+                if([self coord:screenX inRect:clippedDirtyRect])
+                {
+                    [[NSColor yellowColor] setFill];
+                    [[NSColor yellowColor] setStroke];
+                    
+                    CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
+                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.7);
+                    
+                    [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                    if(self.magnification < 0.15)
+                        [self drawLabel:i atPoint:bottom inContext:context];
+                }
             }
         }
-        
-        for(int i = 0; i < floor(CMTimeGetSeconds(self.duration)/60.0); i++)
+        // Minutes
+        for(int i = 0; i < numMinutes; i++)
         {
             float screenX = [self millisToScreenX:(i * 1000.0 * 60)];
-            if(screenX > clippedDirtyRect.origin.x && screenX < clippedDirtyRect.size.width)
+            if([self coord:screenX inRect:clippedDirtyRect])
             {
                 [[NSColor orangeColor] setFill];
                 [[NSColor orangeColor] setStroke];
                 
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.7);
+                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.5);
                 
                 [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                [self drawLabel:i atPoint:bottom inContext:context];
+            }
+        }
+        
+        // Hours
+        for(int i = 0; i < numHours; i++)
+        {
+            float screenX = [self millisToScreenX:(i * 1000.0 * 60 * 60)];
+            if([self coord:screenX inRect:clippedDirtyRect])
+            {
+                [[NSColor redColor] setFill];
+                [[NSColor redColor] setStroke];
+                
+                CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
+                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.3);
+                
+                [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                [self drawLabel:i atPoint:bottom inContext:context];
             }
         }
 
-        
     }
+}
+
+- (BOOL) coord:(float)screenX inRect:(CGRect)clippedDirtyRect
+{
+    return (screenX > (clippedDirtyRect.origin.x - FLT_EPSILON) && screenX <= (clippedDirtyRect.size.width + FLT_EPSILON));
+}
+
+- (void) drawLabel:(NSUInteger)i atPoint:(CGPoint)point inContext:(CGContextRef) context
+{
+    CGContextSetLineWidth(context, 2.0);
+    CGContextSelectFont(context, "Helvetica", 8, kCGEncodingMacRoman);
+    CGContextSetCharacterSpacing(context, 1.7);
+    CGContextSetTextDrawingMode(context, kCGTextFill);
+    NSString* s = [NSString stringWithFormat:@"%lu", (unsigned long)i ];
+    CGContextShowTextAtPoint(context, point.x, point.y -10, [s cStringUsingEncoding:NSASCIIStringEncoding], s.length);
+
 }
 @end
