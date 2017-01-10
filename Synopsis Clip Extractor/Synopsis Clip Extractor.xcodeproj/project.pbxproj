@@ -420,6 +420,7 @@
 				1BCFBEE71E1D76700008CB03 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

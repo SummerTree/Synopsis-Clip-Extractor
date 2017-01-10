@@ -24,7 +24,7 @@
                 <rect key="frame" x="0.0" y="0.0" width="507" height="413"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MOf-qc-qLj" customClass="KeyframeView">
+                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MOf-qc-qLj" customClass="TimelineView">
                         <rect key="frame" x="0.0" y="0.0" width="507" height="172"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     </customView>
