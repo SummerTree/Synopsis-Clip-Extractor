@@ -8,7 +8,8 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="Document">
             <connections>
-                <outlet property="keyframeView" destination="MOf-qc-qLj" id="y2T-UL-163"/>
+                <outlet property="playerView" destination="bWc-PJ-n5s" id="du4-8r-oVR"/>
+                <outlet property="timelineView" destination="MOf-qc-qLj" id="xiR-HR-ZPu"/>
                 <outlet property="window" destination="xOd-HO-29H" id="JIz-fz-R2o"/>
             </connections>
         </customObject>
@@ -17,23 +18,46 @@
         <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="xOd-HO-29H" userLabel="Window">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="133" y="235" width="507" height="413"/>
+            <rect key="contentRect" x="133" y="235" width="516" height="419"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1178"/>
             <value key="minSize" type="size" width="94" height="86"/>
             <view key="contentView" wantsLayer="YES" id="gIp-Ho-8D9">
-                <rect key="frame" x="0.0" y="0.0" width="507" height="413"/>
+                <rect key="frame" x="0.0" y="0.0" width="516" height="419"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MOf-qc-qLj" customClass="TimelineView">
-                        <rect key="frame" x="0.0" y="0.0" width="507" height="172"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                    </customView>
+                    <splitView dividerStyle="thin" translatesAutoresizingMaskIntoConstraints="NO" id="EKb-22-H0k">
+                        <rect key="frame" x="0.0" y="0.0" width="516" height="419"/>
+                        <subviews>
+                            <customView fixedFrame="YES" id="bWc-PJ-n5s" customClass="PlayerView">
+                                <rect key="frame" x="0.0" y="0.0" width="516" height="240.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                            </customView>
+                            <customView fixedFrame="YES" id="MOf-qc-qLj" customClass="TimelineView">
+                                <rect key="frame" x="0.0" y="241.5" width="516" height="177.5"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
+                            </customView>
+                        </subviews>
+                        <holdingPriorities>
+                            <real value="250"/>
+                            <real value="250"/>
+                        </holdingPriorities>
+                    </splitView>
                 </subviews>
+                <constraints>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" id="M5W-B2-NAw"/>
+                    <constraint firstAttribute="trailing" secondItem="EKb-22-H0k" secondAttribute="trailing" id="WmY-eQ-71R"/>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="leading" secondItem="gIp-Ho-8D9" secondAttribute="leading" id="bmM-vw-Qts"/>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="height" secondItem="gIp-Ho-8D9" secondAttribute="height" id="fTI-pm-1ev"/>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="width" secondItem="gIp-Ho-8D9" secondAttribute="width" id="mHO-4s-8Yz"/>
+                    <constraint firstAttribute="bottom" secondItem="EKb-22-H0k" secondAttribute="bottom" id="me1-w9-1Lu"/>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="leading" secondItem="gIp-Ho-8D9" secondAttribute="leading" id="v0T-ha-Ofv"/>
+                    <constraint firstItem="EKb-22-H0k" firstAttribute="top" secondItem="gIp-Ho-8D9" secondAttribute="top" id="yoR-X2-Fpv"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="delegate" destination="-2" id="0bl-1N-x8E"/>
             </connections>
-            <point key="canvasLocation" x="131.5" y="161.5"/>
+            <point key="canvasLocation" x="33" y="101.5"/>
         </window>
     </objects>
 </document>

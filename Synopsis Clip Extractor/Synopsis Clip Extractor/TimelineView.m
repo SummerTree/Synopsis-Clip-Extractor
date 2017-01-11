@@ -7,6 +7,8 @@
 //
 
 #import "TimelineView.h"
+#import <AVFoundation/AVFoundation.h>
+
 @interface TimelineView()
 @property (nonatomic, assign) CMTime frameDuration;
 @property (nonatomic, assign) CMTime duration;
@@ -52,7 +54,6 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 }
 
 
-
 @implementation TimelineView
 
 - (void) awakeFromNib
@@ -85,16 +86,13 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 
 - (void) magnifyWithEvent:(NSEvent *)event
 {
-    self.magnification += event.magnification;
+    self.magnification -= event.magnification;
     self.magnification = MAX(0.001, self.magnification);
     self.magnification = MIN(10, self.magnification);
     
     NSLog(@"magnification: %f", self.magnification );
     
     [self recalculateUnits];
-    
-    //    NSSize scale = NSMakeSize(self.scale.width + event.magnification, 1.0);
-    //    [self setScale:scale];
 }
 
 - (void) scrollWheel:(NSEvent *)event
@@ -108,10 +106,18 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     }
 }
 
-- (void) updateScrollOrigin:(CGFloat)amount
+
+
+- (void) mouseMoved:(NSEvent *)event
 {
+    CGPoint locationInView = [self convertPoint:[event locationInWindow] fromView:nil];
+    CMTime currentTimelineTime = CMTimeMultiplyByFloat64(self.duration, [self timelineViewToMillis:locationInView.x]);
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"PlayerTime" object:self userInfo:@{@"timelineTime" : [NSValue valueWithCMTime:currentTimelineTime]} ];
     
+    NSLog(@"%@", CMTimeCopyDescription(kCFAllocatorDefault, currentTimelineTime));
 }
+
 - (void) recalculateUnits
 {
     self.numFrames = ceil(CMTimeGetSeconds(self.duration) / CMTimeGetSeconds(self.frameDuration));
@@ -119,35 +125,37 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     self.zoomRangeMin = 0.0 + self.scrollOrigin;
     self.zoomRangeMax = self.magnification + self.scrollOrigin;;
     
-//    self.durationInFrames = self.frameDuration.value * self.duration.value;
-//    self.frameTickInPixels = (1.0);
-//    self.frameDurationInPixels = (self.frameTickInPixels * self.frameDuration.value );
-//    self.totalDurationInPixels = (self.frameTickInPixels * self.duration.value);
-//    
-//    NSLog(@"m %f ftp %lu, fdp %lu, tdp %lu", self.magnification, (unsigned long)self.frameTickInPixels, (unsigned long)self.frameDurationInPixels, (unsigned long)self.totalDurationInPixels);
-    
     [self setNeedsDisplay:YES];
 }
 
-
-- (CGFloat) millisToScreenX:(CGFloat)millis
+- (CGFloat) millisToTimelineView:(CGFloat)millis
 {
     return [self normalizedXtoScreenX:(millis/(CMTimeGetSeconds(self.duration) * 1000.0))];
 }
 
-- (float) normalizedXtoScreenX:(float)x
+- (CGFloat) timelineViewToMillis:(CGFloat)millis
 {
-//    return normalizedXtoScreenX(x, getViewRange());
+    NSLog(@"Timeline View: %f", millis);
+    CGFloat timeline = [self screenXToNormalizedX:millis];
+    NSLog(@"Timeline %f", timeline);
+    
+    return  timeline;
+}
+
+- (CGFloat) normalizedXtoScreenX:(float)x
+{
     return map(x, self.zoomRangeMin, self.zoomRangeMax, self.bounds.origin.x, self.bounds.size.width, false);
 }
 
-//float normalizedXtoScreenX(float x, ofRange inputRange){
-//    return ofMap(x, inputRange.min, inputRange.max, getDrawRect().getMinX(), getDrawRect().getMaxX(), false);
-//}
+- (CGFloat) screenXToNormalizedX:(float)x
+{
+    return map(x, self.bounds.origin.x, self.bounds.size.width, self.zoomRangeMin, self.zoomRangeMax, false);
+}
 
+- (void)drawRect:(NSRect)dirtyRect
+{
+    [self updateTrackingAreas];
 
-- (void)drawRect:(NSRect)dirtyRect {
-    
     [super drawRect:dirtyRect];
     
     // Drawing code here.
@@ -174,16 +182,15 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         CGContextFillRect(context, clippedDirtyRect);
         
         // Draw Frames
+        [[NSColor grayColor] setFill];
+        [[NSColor grayColor] setStroke];
         if(self.magnification < 0.07)
         {
             for(int i = 0; i < self.numFrames; i++)
             {
-                float screenX = [self millisToScreenX:(i * frameDurationInMS)];
+                float screenX = [self millisToTimelineView:(i * frameDurationInMS)];
                 if([self coord:screenX inRect:clippedDirtyRect])
                 {
-                    [[NSColor lightGrayColor] setFill];
-                    [[NSColor lightGrayColor] setStroke];
-
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                     CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
                     
@@ -194,16 +201,15 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             }
         }
         
+        [[NSColor yellowColor] setFill];
+        [[NSColor yellowColor] setStroke];
         if(self.magnification < 0.5)
         {
             for(int i = 0; i < numSeconds; i++)
             {
-                float screenX = [self millisToScreenX:(i * 1000.0)];
+                float screenX = [self millisToTimelineView:(i * 1000.0)];
                 if([self coord:screenX inRect:clippedDirtyRect])
                 {
-                    [[NSColor yellowColor] setFill];
-                    [[NSColor yellowColor] setStroke];
-                    
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                     CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.7);
                     
@@ -214,14 +220,13 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             }
         }
         // Minutes
+        [[NSColor orangeColor] setFill];
+        [[NSColor orangeColor] setStroke];
         for(int i = 0; i < numMinutes; i++)
         {
-            float screenX = [self millisToScreenX:(i * 1000.0 * 60)];
+            float screenX = [self millisToTimelineView:(i * 1000.0 * 60)];
             if([self coord:screenX inRect:clippedDirtyRect])
             {
-                [[NSColor orangeColor] setFill];
-                [[NSColor orangeColor] setStroke];
-                
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                 CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.5);
                 
@@ -231,14 +236,13 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         }
         
         // Hours
+        [[NSColor redColor] setFill];
+        [[NSColor redColor] setStroke];
         for(int i = 0; i < numHours; i++)
         {
-            float screenX = [self millisToScreenX:(i * 1000.0 * 60 * 60)];
+            float screenX = [self millisToTimelineView:(i * 1000.0 * 60 * 60)];
             if([self coord:screenX inRect:clippedDirtyRect])
             {
-                [[NSColor redColor] setFill];
-                [[NSColor redColor] setStroke];
-                
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                 CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.3);
                 
@@ -247,6 +251,21 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             }
         }
 
+        [[NSColor lightGrayColor] setFill];
+        [[NSColor lightGrayColor] setStroke];
+        for(int i = 0; i < self.interestingTimeRangesArray.count; i++)
+        {
+            CMTimeRange currentRange = [(NSValue*)self.interestingTimeRangesArray[i] CMTimeRangeValue];
+            
+            float screenX = [self millisToTimelineView:((i * 1000.0 * CMTimeGetSeconds(currentRange.duration)) )];
+            if([self coord:screenX inRect:clippedDirtyRect])
+            {
+                CGPoint top = CGPointMake(screenX, 0.5 * clippedDirtyRect.size.height * [(NSNumber*)self.interestingPointsArray[i] floatValue] + 10);
+                CGPoint bottom = CGPointMake(top.x, 0);
+                
+                [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+            }
+        }
     }
 }
 
@@ -265,4 +284,21 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     CGContextShowTextAtPoint(context, point.x, point.y -10, [s cStringUsingEncoding:NSASCIIStringEncoding], s.length);
 
 }
+
+
+-(void)updateTrackingAreas
+{
+    for(NSTrackingArea* trackingArea in self.trackingAreas)
+    {
+        [self removeTrackingArea:trackingArea];
+    }
+    
+    int opts = (NSTrackingMouseMoved | NSTrackingMouseEnteredAndExited | NSTrackingActiveInActiveApp | NSTrackingAssumeInside | NSTrackingInVisibleRect);
+    NSTrackingArea* trackingArea = [ [NSTrackingArea alloc] initWithRect:[self bounds]
+                                                                 options:opts
+                                                                   owner:self
+                                                                userInfo:nil];
+    [self addTrackingArea:trackingArea];
+}
+
 @end

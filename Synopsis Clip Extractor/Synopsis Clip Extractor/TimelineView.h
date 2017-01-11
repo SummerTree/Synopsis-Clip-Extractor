@@ -12,4 +12,7 @@
 @interface TimelineView : NSView
 - (void) setFrameFromDuration:(CMTime)duration andFrameDuration:(CMTime)frameDuration;
 
+@property (strong) NSArray* interestingPointsArray;
+@property (strong) NSArray* interestingTimeRangesArray;
+
 @end

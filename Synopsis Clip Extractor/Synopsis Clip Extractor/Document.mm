@@ -12,6 +12,7 @@
 #import <Synopsis/GZIP.h>
 #import "KeyframeView.h"
 #import "TimelineView.h"
+#import "PlayerView.h"
 
 @interface Document ()
 {
@@ -19,7 +20,7 @@
     CMSimpleQueueRef jsonMetadataQueue;
 }
 
-@property (weak) IBOutlet KeyframeView* keyframeView;
+@property (weak) IBOutlet PlayerView* playerView;
 @property (weak) IBOutlet TimelineView* timelineView;
 
 @property (strong) AVURLAsset* clipAsset;
@@ -33,8 +34,10 @@
 @property (strong) dispatch_queue_t backgroundJSONParseQueue;
 @property (strong) dispatch_queue_t backgroundCalculateQueue;
 
-// Array of CMTimeRanges
-@property (strong) NSMutableArray<NSValue*>* potentialEditPoints;
+
+@property (strong) NSMutableArray<NSNumber*>* derivedMetadataInfo;
+@property (strong) NSMutableArray<NSValue*>* derivedMetadataTimeRanges;
+@property (strong) NSMutableArray<NSNumber*>* derivedMetadataBestGuessFrames;
 
 // For Delta / Dervitative calculations
 @property (strong) NSArray* lastFeatureVector;
@@ -62,6 +65,10 @@
         self.backgroundDecompressionQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundDecompressionQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         self.backgroundJSONParseQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundJSONParseQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
         self.backgroundCalculateQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundCalculateQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
+        
+        self.derivedMetadataTimeRanges = [NSMutableArray new];
+        self.derivedMetadataInfo = [NSMutableArray new];
+    
     }
     return self;
 }
@@ -105,9 +112,10 @@
     self = [super initWithContentsOfURL:url ofType:typeName error:outError];
     if(self)
     {
-        self.clipAsset = [AVURLAsset assetWithURL:url];
+        self.clipAsset = [AVURLAsset URLAssetWithURL:url options:@{AVURLAssetPreferPreciseDurationAndTimingKey : @YES} ];
         
         self.clipAssetReader = [AVAssetReader assetReaderWithAsset:self.clipAsset error:nil];
+        
     }
 
     return self;
@@ -123,8 +131,17 @@
     CMTime duration = metadataAssetTrack.timeRange.duration;
     CMTime frameDuration = metadataAssetTrack.minFrameDuration;
     
-    [self.keyframeView setFrameFromDuration:duration andFrameDuration:frameDuration];
     [self.timelineView setFrameFromDuration:duration andFrameDuration:frameDuration];
+    [self.playerView setCurrentPlayerAsset:self.clipAsset];
+
+    [[NSNotificationCenter defaultCenter] addObserverForName:@"PlayerTime" object:self.timelineView queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note)
+    {
+        CMTime currentTime = [[note.userInfo objectForKey:@"timelineTime"] CMTimeValue];;
+        [self.playerView setCurrentTime:currentTime];
+    }];
+     
+//     [[NSNotificationCenter defaultCenter] postNotificationName:@"PlayerTime" object:self userInfo:@{@"timelineTime" : [NSValue valueWithCMTime:currentTimelineTime]} ];
+
     
     if(metadataAssetTrack)
     {
@@ -190,9 +207,14 @@
                         
                         if([key isEqualToString:kSynopsislMetadataIdentifier])
                         {
-                            CFDataRef data = (CFDataRef)CFBridgingRetain(metadataItem.value);
-                            if(data)
-                                CMSimpleQueueEnqueue(compressedMetadataQueue, data);
+                            NSData* data = (NSData*)metadataItem.value;
+                            NSDictionary* dataAndTime = @{@"data" : data,
+                                                          @"timeRange" : [NSValue valueWithCMTimeRange:(timedMetadata.timeRange)]
+                                                          };
+                            
+                            CFDictionaryRef cfDateAndTime = (CFDictionaryRef)CFBridgingRetain(dataAndTime);
+                            if(cfDateAndTime)
+                                CMSimpleQueueEnqueue(compressedMetadataQueue, cfDateAndTime);
                         }
                     }
                 }
@@ -232,9 +254,9 @@
                 __block int dataCount = 0;
                 for(int i = 0; i < batchCount; i++)
                 {
-                    CFDataRef data = (CFDataRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
+                    CFDictionaryRef cfDataAndTime = (CFDictionaryRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
                     
-                    if(data)
+                    if(cfDataAndTime)
                     {
                         dispatch_group_enter(batchGroup);
                         
@@ -242,8 +264,10 @@
                             
                             @autoreleasepool
                             {
-                                NSData* json = [(__bridge NSData*)data gunzippedData];
+                                NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
                                 
+                                NSData* json = [dataAndTime[@"data"] gunzippedData];
+                                NSValue* timeRangeValue = dataAndTime[@"timeRange"];
                                 if(json)
                                 {
                                     NSDictionary* frameMetadata = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:nil];
@@ -254,11 +278,11 @@
                                         [batchLock lock];
                                         dataCount++;
 //                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
-                                        [batchCache addObject:frameMetadata];
+                                        [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
                                         [batchLock unlock];
                                     }
                                 }
-                                CFRelease(data);
+                                CFRelease(cfDataAndTime);
                             }
                             
                             dispatch_group_leave(batchGroup);
@@ -272,17 +296,17 @@
 
                 for(int i = 0; i < batchCache.count; i++)
                 {
-                    NSDictionary* frameMetadata = batchCache[i];
+                    NSDictionary* jsonAndTime = batchCache[i];
                     
-                    if(frameMetadata)
+                    if(jsonAndTime)
                     {
 //                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
 //                            @autoreleasepool {
-                                [weakSelf calculateFromMetadata:frameMetadata];
+                                [weakSelf calculateFromMetadata:jsonAndTime];
 //                            }
 //                        });
 
-                        frameMetadata = nil;
+                        jsonAndTime = nil;
                     }
                 }
                 
@@ -303,12 +327,14 @@
                 continue;
             }
 
-            CFDataRef data = (CFDataRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
+            CFDictionaryRef cfDataAndTime = (CFDictionaryRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
             
-            if(data)
+            if(cfDataAndTime)
             {
-                NSData* json = [(__bridge NSData*)data gunzippedData];
+                NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
                 
+                NSData* json = [dataAndTime[@"data"] gunzippedData];
+                NSValue* timeRangeValue = dataAndTime[@"timeRange"];
                 if(json)
                 {
                     NSDictionary* frameMetadata = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:nil];
@@ -317,14 +343,14 @@
                     {
 //                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
 //                            @autoreleasepool {
-                                [weakSelf calculateFromMetadata:frameMetadata];
+                                [weakSelf calculateFromMetadata:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
 //                            }
 //                        });
                     }
                     
                     frameMetadata = nil;
                 }
-                CFRelease(data);
+                CFRelease(cfDataAndTime);
             }
         }
         
@@ -335,10 +361,18 @@
     
     dispatch_group_wait(pipelineGroup, DISPATCH_TIME_FOREVER);
     NSLog(@"Finished");
+    
+    self.timelineView.interestingTimeRangesArray = self.derivedMetadataTimeRanges;
+    self.timelineView.interestingPointsArray = self.derivedMetadataInfo;
 }
 
-- (void) calculateFromMetadata:(NSDictionary*)frameMetadata
+- (void) calculateFromMetadata:(NSDictionary*)jsonAndTimeRangeDict
 {
+    NSDictionary* frameMetadata = jsonAndTimeRangeDict[@"json"];
+    NSValue* timeRange = jsonAndTimeRangeDict[@"timeRange"];
+    
+    [self.derivedMetadataTimeRanges addObject:timeRange];
+        
     NSDictionary* standard = [frameMetadata objectForKey:kSynopsisStandardMetadataDictKey];
     NSArray* featureVector = [standard objectForKey:kSynopsisStandardMetadataFeatureVectorDictKey];
     NSArray* histogram = [standard objectForKey:kSynopsisStandardMetadataHistogramDictKey];
@@ -398,17 +432,19 @@
     dispatch_group_wait(calcGroup, DISPATCH_TIME_FOREVER);
     
     //                                if(lastComparedFeatures)
-    {
+//    {
         float deriviativeFeature = self.lastComparedFeatures - comparedFeatures;
-    }
+//    }
     //                                if(lastComparedHistograms)
-    {
+//    {
         float deriviativeHistogram = self.lastComparedHistograms - comparedHistograms;
-    }
+//    }
     //                                if(lastComparedHistograms)
-    {
+//    {
        float  deriviativeHash = self.lastcomparedHash - comparedHashes;
-    }
+//    }
+    
+    [self.derivedMetadataInfo addObject:@(comparedFeatures)];
     
     //                                        NSLog(@"Time: %f, f %f, df %f  hist %f, dhist %f, hash %f, dhash %f", CMTimeGetSeconds(timedMetadata.timeRange.start),
     //                                              comparedFeatures, deriviativeFeature,
