@@ -20,7 +20,7 @@
 @property (nonatomic, assign) CGFloat zoomRangeMin;
 @property (nonatomic, assign) CGFloat zoomRangeMax;
 
-
+@property (nonatomic, assign) CGPoint currentMousePosition;
 @end
 
 
@@ -106,16 +106,17 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     }
 }
 
-
-
 - (void) mouseMoved:(NSEvent *)event
 {
     CGPoint locationInView = [self convertPoint:[event locationInWindow] fromView:nil];
+    
+    self.currentMousePosition = locationInView;
+    
     CMTime currentTimelineTime = CMTimeMultiplyByFloat64(self.duration, [self timelineViewToMillis:locationInView.x]);
 
+    [self recalculateUnits];
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"PlayerTime" object:self userInfo:@{@"timelineTime" : [NSValue valueWithCMTime:currentTimelineTime]} ];
-    
-    NSLog(@"%@", CMTimeCopyDescription(kCFAllocatorDefault, currentTimelineTime));
 }
 
 - (void) recalculateUnits
@@ -135,10 +136,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 
 - (CGFloat) timelineViewToMillis:(CGFloat)millis
 {
-    NSLog(@"Timeline View: %f", millis);
     CGFloat timeline = [self screenXToNormalizedX:millis];
-    NSLog(@"Timeline %f", timeline);
-    
     return  timeline;
 }
 
@@ -150,6 +148,12 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 - (CGFloat) screenXToNormalizedX:(float)x
 {
     return map(x, self.bounds.origin.x, self.bounds.size.width, self.zoomRangeMin, self.zoomRangeMax, false);
+}
+
+- (CGFloat) frameDurationToTimelineView
+{
+    CGFloat duration = (CMTimeGetSeconds(self.frameDuration) * 1000.0)/(CMTimeGetSeconds(self.duration) * 1000.0);
+    return map(duration, 0, self.magnification, 0.0, self.bounds.size.width, false);
 }
 
 - (void)drawRect:(NSRect)dirtyRect
@@ -176,8 +180,6 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     {
         NSRect clippedDirtyRect = rects[i];
         
-        NSLog(@"Drawing Rect: %@", NSStringFromRect(clippedDirtyRect));
-        
         [[NSColor darkGrayColor] setFill];
         CGContextFillRect(context, clippedDirtyRect);
         
@@ -192,7 +194,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
                 if([self coord:screenX inRect:clippedDirtyRect])
                 {
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
+                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.95);
                     
                     [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
                     if(self.magnification < 0.07/15.0)
@@ -211,7 +213,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
                 if([self coord:screenX inRect:clippedDirtyRect])
                 {
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.7);
+                    CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
                     
                     [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
                     if(self.magnification < 0.15)
@@ -228,7 +230,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             if([self coord:screenX inRect:clippedDirtyRect])
             {
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.5);
+                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.85);
                 
                 [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
                 [self drawLabel:i atPoint:bottom inContext:context];
@@ -244,7 +246,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             if([self coord:screenX inRect:clippedDirtyRect])
             {
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
-                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.3);
+                CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.8);
                 
                 [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
                 [self drawLabel:i atPoint:bottom inContext:context];
@@ -252,15 +254,15 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         }
 
 
+        CGFloat frameDuration = [self frameDurationToTimelineView];
         for(int i = 0; i < self.interestingTimeRangesArray.count; i++)
         {
             CMTimeRange currentRange = [(NSValue*)self.interestingTimeRangesArray[i] CMTimeRangeValue];
             
-            float screenX = [self millisToTimelineView:((i * 1000.0 * CMTimeGetSeconds(currentRange.duration)) )];
+            float screenX = [self millisToTimelineView:((1000.0 * CMTimeGetSeconds(currentRange.start)) )];
             
             if([self coord:screenX inRect:clippedDirtyRect])
             {
-
                 NSArray* infoTracks = self.interestingPointsArray[i];
                 NSUInteger trackCount = infoTracks.count;
                 
@@ -268,31 +270,40 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
                 CGFloat hueSlice = 1.0 / trackCount;
 
                 NSUInteger currentTrack = 0;
-                CGFloat trackHeight = 0.5 * clippedDirtyRect.size.height;
+                CGFloat trackHeight =  clippedDirtyRect.size.height;
                 trackHeight /= (CGFloat)trackCount;
                 
                 for(NSNumber* trackValue in infoTracks)
                 {
                     NSColor* trackColor = [NSColor colorWithHue:currentHue saturation:0.5 brightness:1.0 alpha:1];
+
                     [trackColor setFill];
-                    [trackColor setStroke];
 
                     CGPoint top = CGPointMake(screenX,  (trackHeight * currentTrack) );//+ [trackValue floatValue] + 10);
-                    CGPoint bottom = CGPointMake(top.x, (trackHeight * currentTrack) + (trackHeight * [trackValue floatValue]) ) ;
+                    CGPoint bottom = CGPointMake(top.x, (trackHeight * currentTrack) - (trackHeight * [trackValue floatValue]) ) ;
                     
-                    [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                    NSRect r = NSMakeRect(top.x, top.y, frameDuration, top.y - bottom.y);
+                    
+                    NSRectFill(r);
                     
                     currentHue += hueSlice;
                     currentTrack++;
                 }
             }
         }
+        
+        // Draw current time line
+        [[NSColor whiteColor] setFill];
+        [[NSColor whiteColor] setStroke];
+        CGPoint top = CGPointMake(self.currentMousePosition.x,  self.bounds.size.height);
+        CGPoint bottom = CGPointMake(self.currentMousePosition.x,  0);;
+        [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
     }
 }
 
 - (BOOL) coord:(float)screenX inRect:(CGRect)clippedDirtyRect
 {
-    return (screenX > (clippedDirtyRect.origin.x - FLT_EPSILON) && screenX <= (clippedDirtyRect.size.width + FLT_EPSILON));
+    return ((screenX + FLT_EPSILON) >= (clippedDirtyRect.origin.x) && (screenX - FLT_EPSILON) <= (clippedDirtyRect.size.width));
 }
 
 - (void) drawLabel:(NSUInteger)i atPoint:(CGPoint)point inContext:(CGContextRef) context

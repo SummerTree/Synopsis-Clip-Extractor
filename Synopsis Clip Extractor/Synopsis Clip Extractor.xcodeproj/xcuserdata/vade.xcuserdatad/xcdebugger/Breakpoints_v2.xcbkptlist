@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505852096.419313"
+            timestampString = "505867615.363601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "425"
-            endingLineNumber = "425"
+            startingLineNumber = "434"
+            endingLineNumber = "434"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505852096.419313"
+            timestampString = "505867615.363601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "394"
-            endingLineNumber = "394"
+            startingLineNumber = "403"
+            endingLineNumber = "403"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505852096.419313"
+            timestampString = "505867615.363601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "396"
-            endingLineNumber = "396"
+            startingLineNumber = "405"
+            endingLineNumber = "405"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505858026.31918"
+            timestampString = "505867615.363601"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "461"
-            endingLineNumber = "461"
+            startingLineNumber = "470"
+            endingLineNumber = "470"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -362,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505859662.149887"
+            timestampString = "505866200.071551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "281"
-            endingLineNumber = "281"
+            startingLineNumber = "282"
+            endingLineNumber = "282"
             landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
@@ -378,11 +378,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505859662.149887"
+            timestampString = "505866200.071551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "282"
-            endingLineNumber = "282"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
             landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
@@ -458,27 +458,59 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505852556.089412"
+            timestampString = "505866200.071551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
-            landmarkName = "-timelineViewToMillis:"
+            startingLineNumber = "274"
+            endingLineNumber = "274"
+            landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505859662.149887"
+            timestampString = "505866200.071551"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "273"
-            endingLineNumber = "273"
+            startingLineNumber = "261"
+            endingLineNumber = "261"
+            landmarkName = "-drawRect:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Synopsis Clip Extractor/TimelineView.m"
+            timestampString = "505866200.071551"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "263"
+            endingLineNumber = "263"
+            landmarkName = "-drawRect:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Synopsis Clip Extractor/TimelineView.m"
+            timestampString = "505866200.071551"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "266"
+            endingLineNumber = "266"
             landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>

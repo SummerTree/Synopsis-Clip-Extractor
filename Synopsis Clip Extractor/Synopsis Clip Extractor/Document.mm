@@ -385,6 +385,15 @@
     // Parallelize calculations:
     dispatch_group_t calcGroup = dispatch_group_create();
     
+    if(!self.lastFeatureVector)
+        self.lastFeatureVector = featureVector;
+
+    if(!self.lastHistogram)
+        self.lastHistogram = histogram;
+
+    if(!self.lastHash)
+        self.lastHash = hash;
+    
     if(self.lastFeatureVector && self.lastFeatureVector.count && featureVector.count && (self.lastFeatureVector.count == featureVector.count))
     {
         dispatch_group_enter(calcGroup);
