@@ -35,9 +35,9 @@
 @property (strong) dispatch_queue_t backgroundCalculateQueue;
 
 
-@property (strong) NSMutableArray<NSNumber*>* derivedMetadataInfo;
+@property (strong) NSMutableArray<NSArray<NSNumber*>*>* derivedMetadataInfo;
 @property (strong) NSMutableArray<NSValue*>* derivedMetadataTimeRanges;
-@property (strong) NSMutableArray<NSNumber*>* derivedMetadataBestGuessFrames;
+@property (strong) NSMutableArray<NSNumber*>* derivedMetadataBestGuessEditTimes;
 
 // For Delta / Dervitative calculations
 @property (strong) NSArray* lastFeatureVector;
@@ -444,7 +444,9 @@
        float  deriviativeHash = self.lastcomparedHash - comparedHashes;
 //    }
     
-    [self.derivedMetadataInfo addObject:@(comparedFeatures)];
+    NSArray* infoTracks = @[ @(comparedFeatures), @(comparedHistograms), @(comparedHashes), @(deriviativeFeature), @(deriviativeHistogram), @(deriviativeHash)];
+    
+    [self.derivedMetadataInfo addObject:infoTracks];
     
     //                                        NSLog(@"Time: %f, f %f, df %f  hist %f, dhist %f, hash %f, dhash %f", CMTimeGetSeconds(timedMetadata.timeRange.start),
     //                                              comparedFeatures, deriviativeFeature,

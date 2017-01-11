@@ -160,7 +160,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     
     // Drawing code here.
     CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-    
+
     const NSRect *rects;
     NSInteger count;
     
@@ -251,19 +251,40 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             }
         }
 
-        [[NSColor lightGrayColor] setFill];
-        [[NSColor lightGrayColor] setStroke];
+
         for(int i = 0; i < self.interestingTimeRangesArray.count; i++)
         {
             CMTimeRange currentRange = [(NSValue*)self.interestingTimeRangesArray[i] CMTimeRangeValue];
             
             float screenX = [self millisToTimelineView:((i * 1000.0 * CMTimeGetSeconds(currentRange.duration)) )];
+            
             if([self coord:screenX inRect:clippedDirtyRect])
             {
-                CGPoint top = CGPointMake(screenX, 0.5 * clippedDirtyRect.size.height * [(NSNumber*)self.interestingPointsArray[i] floatValue] + 10);
-                CGPoint bottom = CGPointMake(top.x, 0);
+
+                NSArray* infoTracks = self.interestingPointsArray[i];
+                NSUInteger trackCount = infoTracks.count;
                 
-                [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                CGFloat currentHue = 0;
+                CGFloat hueSlice = 1.0 / trackCount;
+
+                NSUInteger currentTrack = 0;
+                CGFloat trackHeight = 0.5 * clippedDirtyRect.size.height;
+                trackHeight /= (CGFloat)trackCount;
+                
+                for(NSNumber* trackValue in infoTracks)
+                {
+                    NSColor* trackColor = [NSColor colorWithHue:currentHue saturation:0.5 brightness:1.0 alpha:1];
+                    [trackColor setFill];
+                    [trackColor setStroke];
+
+                    CGPoint top = CGPointMake(screenX,  (trackHeight * currentTrack) );//+ [trackValue floatValue] + 10);
+                    CGPoint bottom = CGPointMake(top.x, (trackHeight * currentTrack) + (trackHeight * [trackValue floatValue]) ) ;
+                    
+                    [NSBezierPath strokeLineFromPoint:top toPoint:bottom];
+                    
+                    currentHue += hueSlice;
+                    currentTrack++;
+                }
             }
         }
     }

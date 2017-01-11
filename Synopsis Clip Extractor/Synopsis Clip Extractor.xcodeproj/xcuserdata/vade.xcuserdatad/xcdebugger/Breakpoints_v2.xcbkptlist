@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505852096.419313"
+            timestampString = "505858026.31918"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "459"
-            endingLineNumber = "459"
+            startingLineNumber = "461"
+            endingLineNumber = "461"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -362,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505852556.089412"
+            timestampString = "505859662.149887"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "263"
-            endingLineNumber = "263"
+            startingLineNumber = "281"
+            endingLineNumber = "281"
             landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
@@ -378,11 +378,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/TimelineView.m"
-            timestampString = "505852556.089412"
+            timestampString = "505859662.149887"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "264"
-            endingLineNumber = "264"
+            startingLineNumber = "282"
+            endingLineNumber = "282"
             landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
@@ -410,11 +410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/PlayerView.m"
-            timestampString = "505852974.343445"
+            timestampString = "505858026.31918"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "60"
-            endingLineNumber = "60"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
             landmarkName = "-setCurrentPlayerAsset:"
             landmarkType = "7">
          </BreakpointContent>
@@ -442,11 +442,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/PlayerView.m"
-            timestampString = "505852974.343445"
+            timestampString = "505858026.31918"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "64"
-            endingLineNumber = "64"
+            startingLineNumber = "63"
+            endingLineNumber = "63"
             landmarkName = "-setCurrentPlayerAsset:"
             landmarkType = "7">
          </BreakpointContent>
@@ -464,6 +464,22 @@
             startingLineNumber = "140"
             endingLineNumber = "140"
             landmarkName = "-timelineViewToMillis:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Synopsis Clip Extractor/TimelineView.m"
+            timestampString = "505859662.149887"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "273"
+            endingLineNumber = "273"
+            landmarkName = "-drawRect:"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
