@@ -169,6 +169,8 @@
 
 - (void) readOnBackgroundQueue
 {
+    id activityObject = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiated reason:@"Process Metadata"];
+  
     [self.clipAssetReader startReading];
     
     __weak typeof (self) weakSelf = self;
@@ -364,6 +366,9 @@
     
     self.timelineView.interestingTimeRangesArray = self.derivedMetadataTimeRanges;
     self.timelineView.interestingPointsArray = self.derivedMetadataInfo;
+    
+    [NSProcessInfo.processInfo endActivity:activityObject];
+    
 }
 
 - (void) calculateFromMetadata:(NSDictionary*)jsonAndTimeRangeDict

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1B7377891E26A4E1005FA03D /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B7377881E26A4E1005FA03D /* PlayerView.m */; };
+		1B73778C1E27D186005FA03D /* TimelineTrackLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B73778B1E27D186005FA03D /* TimelineTrackLayer.m */; };
+		1B73778F1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B73778E1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m */; };
+		1B7377921E283B66005FA03D /* TimelineLayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B7377911E283B66005FA03D /* TimelineLayerView.m */; };
 		1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED21E1D76700008CB03 /* AppDelegate.m */; };
 		1BCFBED61E1D76700008CB03 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED51E1D76700008CB03 /* main.m */; };
 		1BCFBED91E1D76700008CB03 /* Document.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1BCFBED81E1D76700008CB03 /* Document.mm */; };
@@ -56,6 +59,12 @@
 /* Begin PBXFileReference section */
 		1B7377871E26A4E1005FA03D /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
 		1B7377881E26A4E1005FA03D /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
+		1B73778A1E27D186005FA03D /* TimelineTrackLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineTrackLayer.h; sourceTree = "<group>"; };
+		1B73778B1E27D186005FA03D /* TimelineTrackLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineTrackLayer.m; sourceTree = "<group>"; };
+		1B73778D1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineTrackPlayheadLayer.h; sourceTree = "<group>"; };
+		1B73778E1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineTrackPlayheadLayer.m; sourceTree = "<group>"; };
+		1B7377901E283B66005FA03D /* TimelineLayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineLayerView.h; sourceTree = "<group>"; };
+		1B7377911E283B66005FA03D /* TimelineLayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TimelineLayerView.m; sourceTree = "<group>"; };
 		1BCFBECE1E1D76700008CB03 /* Synopsis Clip Extractor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Synopsis Clip Extractor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCFBED11E1D76700008CB03 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1BCFBED21E1D76700008CB03 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -159,6 +168,12 @@
 				1BCFBEFD1E1DC1D80008CB03 /* KeyframeView.m */,
 				1BCFBF071E2180E70008CB03 /* TimelineView.h */,
 				1BCFBF081E2180E70008CB03 /* TimelineView.m */,
+				1B7377901E283B66005FA03D /* TimelineLayerView.h */,
+				1B7377911E283B66005FA03D /* TimelineLayerView.m */,
+				1B73778A1E27D186005FA03D /* TimelineTrackLayer.h */,
+				1B73778B1E27D186005FA03D /* TimelineTrackLayer.m */,
+				1B73778D1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.h */,
+				1B73778E1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m */,
 				1B7377871E26A4E1005FA03D /* PlayerView.h */,
 				1B7377881E26A4E1005FA03D /* PlayerView.m */,
 			);
@@ -254,11 +269,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1B73778F1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m in Sources */,
+				1B73778C1E27D186005FA03D /* TimelineTrackLayer.m in Sources */,
 				1BCFBEFE1E1DC1D80008CB03 /* KeyframeView.m in Sources */,
 				1B7377891E26A4E1005FA03D /* PlayerView.m in Sources */,
 				1BCFBED91E1D76700008CB03 /* Document.mm in Sources */,
 				1BCFBED61E1D76700008CB03 /* main.m in Sources */,
 				1BCFBF091E2180E70008CB03 /* TimelineView.m in Sources */,
+				1B7377921E283B66005FA03D /* TimelineLayerView.m in Sources */,
 				1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

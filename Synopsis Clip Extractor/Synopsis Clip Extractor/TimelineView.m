@@ -75,7 +75,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         self.frameDuration = frameDuration;
         self.duration = duration;
         
-        [self setNeedsDisplay:YES];
+        [self recalculateUnits];
     }
 }
 
@@ -88,7 +88,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
 {
     self.magnification -= event.magnification;
     self.magnification = MAX(0.001, self.magnification);
-    self.magnification = MIN(10, self.magnification);
+    self.magnification = MIN(1, self.magnification);
     
     NSLog(@"magnification: %f", self.magnification );
     
@@ -291,7 +291,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
                 }
             }
         }
-        
+
         // Draw current time line
         [[NSColor whiteColor] setFill];
         [[NSColor whiteColor] setStroke];
