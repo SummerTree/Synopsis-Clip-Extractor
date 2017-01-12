@@ -191,7 +191,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             for(int i = 0; i < self.numFrames; i++)
             {
                 float screenX = [self millisToTimelineView:(i * frameDurationInMS)];
-                if([self coord:screenX inRect:clippedDirtyRect])
+                if([self coord:screenX duration:0 inRect:clippedDirtyRect])
                 {
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                     CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.95);
@@ -210,7 +210,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             for(int i = 0; i < numSeconds; i++)
             {
                 float screenX = [self millisToTimelineView:(i * 1000.0)];
-                if([self coord:screenX inRect:clippedDirtyRect])
+                if([self coord:screenX duration:0 inRect:clippedDirtyRect])
                 {
                     CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                     CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.9);
@@ -227,7 +227,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         for(int i = 0; i < numMinutes; i++)
         {
             float screenX = [self millisToTimelineView:(i * 1000.0 * 60)];
-            if([self coord:screenX inRect:clippedDirtyRect])
+            if([self coord:screenX duration:0 inRect:clippedDirtyRect])
             {
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                 CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.85);
@@ -243,7 +243,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
         for(int i = 0; i < numHours; i++)
         {
             float screenX = [self millisToTimelineView:(i * 1000.0 * 60 * 60)];
-            if([self coord:screenX inRect:clippedDirtyRect])
+            if([self coord:screenX duration:0 inRect:clippedDirtyRect])
             {
                 CGPoint top = CGPointMake(screenX, clippedDirtyRect.size.height);
                 CGPoint bottom = CGPointMake(top.x, clippedDirtyRect.size.height * 0.8);
@@ -261,7 +261,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
             
             float screenX = [self millisToTimelineView:((1000.0 * CMTimeGetSeconds(currentRange.start)) )];
             
-            if([self coord:screenX inRect:clippedDirtyRect])
+            if([self coord:screenX duration:frameDuration inRect:clippedDirtyRect])
             {
                 NSArray* infoTracks = self.interestingPointsArray[i];
                 NSUInteger trackCount = infoTracks.count;
@@ -301,9 +301,9 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     }
 }
 
-- (BOOL) coord:(float)screenX inRect:(CGRect)clippedDirtyRect
+- (BOOL) coord:(float)screenX duration:(CGFloat)duration inRect:(CGRect)clippedDirtyRect
 {
-    return ((screenX + FLT_EPSILON) >= (clippedDirtyRect.origin.x) && (screenX - FLT_EPSILON) <= (clippedDirtyRect.size.width));
+    return ((screenX + duration + FLT_EPSILON) >= (clippedDirtyRect.origin.x) && (screenX - duration - FLT_EPSILON) <= (clippedDirtyRect.size.width));
 }
 
 - (void) drawLabel:(NSUInteger)i atPoint:(CGPoint)point inContext:(CGContextRef) context
