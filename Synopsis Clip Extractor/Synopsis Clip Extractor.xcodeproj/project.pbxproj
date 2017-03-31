@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1B5ECAC31E8EE231002F278D /* CustomBackgroundView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B5ECAC21E8EE231002F278D /* CustomBackgroundView.m */; };
 		1B7377891E26A4E1005FA03D /* PlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B7377881E26A4E1005FA03D /* PlayerView.m */; };
 		1B73778C1E27D186005FA03D /* TimelineTrackLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B73778B1E27D186005FA03D /* TimelineTrackLayer.m */; };
 		1B73778F1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 1B73778E1E27D1A7005FA03D /* TimelineTrackPlayheadLayer.m */; };
@@ -57,6 +58,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1B5ECAC11E8EE231002F278D /* CustomBackgroundView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomBackgroundView.h; sourceTree = "<group>"; };
+		1B5ECAC21E8EE231002F278D /* CustomBackgroundView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomBackgroundView.m; sourceTree = "<group>"; };
 		1B7377871E26A4E1005FA03D /* PlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlayerView.h; sourceTree = "<group>"; };
 		1B7377881E26A4E1005FA03D /* PlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PlayerView.m; sourceTree = "<group>"; };
 		1B73778A1E27D186005FA03D /* TimelineTrackLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineTrackLayer.h; sourceTree = "<group>"; };
@@ -125,6 +128,8 @@
 				1BCFBED21E1D76700008CB03 /* AppDelegate.m */,
 				1BCFBED71E1D76700008CB03 /* Document.h */,
 				1BCFBED81E1D76700008CB03 /* Document.mm */,
+				1B5ECAC11E8EE231002F278D /* CustomBackgroundView.h */,
+				1B5ECAC21E8EE231002F278D /* CustomBackgroundView.m */,
 				1BCFBEFB1E1DC1B00008CB03 /* UI */,
 				1BCFBEDA1E1D76700008CB03 /* Document.xib */,
 				1BCFBEDD1E1D76700008CB03 /* Assets.xcassets */,
@@ -278,6 +283,7 @@
 				1BCFBF091E2180E70008CB03 /* TimelineView.m in Sources */,
 				1B7377921E283B66005FA03D /* TimelineLayerView.m in Sources */,
 				1BCFBED31E1D76700008CB03 /* AppDelegate.m in Sources */,
+				1B5ECAC31E8EE231002F278D /* CustomBackgroundView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
