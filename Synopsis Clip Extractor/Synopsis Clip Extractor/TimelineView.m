@@ -180,7 +180,7 @@ static inline CGFloat map(CGFloat value, CGFloat inputMin, CGFloat inputMax, CGF
     {
         NSRect clippedDirtyRect = rects[i];
         
-        [[NSColor darkGrayColor] setFill];
+        [[NSColor blackColor] setFill];
         CGContextFillRect(context, clippedDirtyRect);
         
         // Draw Frames

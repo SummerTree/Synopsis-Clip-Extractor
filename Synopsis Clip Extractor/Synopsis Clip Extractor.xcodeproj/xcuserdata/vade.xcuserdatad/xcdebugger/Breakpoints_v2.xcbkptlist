@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505954111.030379"
+            timestampString = "512681854.985297"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "439"
-            endingLineNumber = "439"
+            startingLineNumber = "432"
+            endingLineNumber = "432"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505954111.030379"
+            timestampString = "512681854.985297"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "408"
-            endingLineNumber = "408"
+            startingLineNumber = "401"
+            endingLineNumber = "401"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505954111.030379"
+            timestampString = "512681854.985297"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
+            startingLineNumber = "403"
+            endingLineNumber = "403"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>
@@ -177,22 +177,6 @@
             endingLineNumber = "66"
             landmarkName = "compareFeatureVector(NSArray* feature1, NSArray* feature2)"
             landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505954111.030379"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "281"
-            endingLineNumber = "281"
-            landmarkName = "-readOnBackgroundQueue"
-            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -250,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Synopsis Clip Extractor/Document.mm"
-            timestampString = "505954111.030379"
+            timestampString = "512681854.985297"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "475"
-            endingLineNumber = "475"
+            startingLineNumber = "468"
+            endingLineNumber = "468"
             landmarkName = "-calculateFromMetadata:"
             landmarkType = "7">
          </BreakpointContent>

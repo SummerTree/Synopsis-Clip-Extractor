@@ -40,8 +40,8 @@
 @property (strong) NSMutableArray<NSNumber*>* derivedMetadataBestGuessEditTimes;
 
 // For Delta / Dervitative calculations
-@property (strong) NSArray* lastFeatureVector;
-@property (strong) NSArray* lastHistogram;
+@property (strong) SynopsisDenseFeature* lastFeatureVector;
+@property (strong) SynopsisDenseFeature* lastHistogram;
 @property (strong) NSString* lastHash;
 
 @property (assign) float lastComparedFeatures;
@@ -267,23 +267,21 @@
                             @autoreleasepool
                             {
                                 NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
-                                
-                                NSData* json = [dataAndTime[@"data"] gunzippedData];
+
+                                NSData* data = dataAndTime[@"data"];
                                 NSValue* timeRangeValue = dataAndTime[@"timeRange"];
-                                if(json)
+
+                                NSDictionary* frameMetadata = [SynopsisMetadataItem decodeSynopsisData:data];
+                                if(frameMetadata)
                                 {
-                                    NSDictionary* frameMetadata = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:nil];
-                                    
-                                    if(frameMetadata)
-                                    {
-                                        // TODO: FIX ORDERING HERE:
-                                        [batchLock lock];
-                                        dataCount++;
-//                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
-                                        [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
-                                        [batchLock unlock];
-                                    }
+                                    // TODO: FIX ORDERING HERE:
+                                    [batchLock lock];
+                                    dataCount++;
+                                    //                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
+                                    [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
+                                    [batchLock unlock];
                                 }
+                                
                                 CFRelease(cfDataAndTime);
                             }
                             
@@ -335,22 +333,17 @@
             {
                 NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
                 
-                NSData* json = [dataAndTime[@"data"] gunzippedData];
+                NSData* data = dataAndTime[@"data"];
                 NSValue* timeRangeValue = dataAndTime[@"timeRange"];
-                if(json)
+                
+                NSDictionary* frameMetadata = [SynopsisMetadataItem decodeSynopsisData:data];
+                if(frameMetadata)
                 {
-                    NSDictionary* frameMetadata = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:nil];
-                    
-                    if(frameMetadata)
-                    {
-//                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
-//                            @autoreleasepool {
-                                [weakSelf calculateFromMetadata:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
-//                            }
-//                        });
-                    }
-                    
-                    frameMetadata = nil;
+                    // TODO: FIX ORDERING HERE:
+                    [batchLock lock];
+                    //                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
+                    [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
+                    [batchLock unlock];
                 }
                 CFRelease(cfDataAndTime);
             }
@@ -379,8 +372,8 @@
     [self.derivedMetadataTimeRanges addObject:timeRange];
         
     NSDictionary* standard = [frameMetadata objectForKey:kSynopsisStandardMetadataDictKey];
-    NSArray* featureVector = [standard objectForKey:kSynopsisStandardMetadataFeatureVectorDictKey];
-    NSArray* histogram = [standard objectForKey:kSynopsisStandardMetadataHistogramDictKey];
+    SynopsisDenseFeature* featureVector = [standard objectForKey:kSynopsisStandardMetadataFeatureVectorDictKey];
+    SynopsisDenseFeature* histogram = [standard objectForKey:kSynopsisStandardMetadataHistogramDictKey];
     NSString* hash = [standard objectForKey:kSynopsisStandardMetadataPerceptualHashDictKey];
     
     __block float comparedHistograms = 0.0;
@@ -399,7 +392,7 @@
     if(!self.lastHash)
         self.lastHash = hash;
     
-    if(self.lastFeatureVector && self.lastFeatureVector.count && featureVector.count && (self.lastFeatureVector.count == featureVector.count))
+    if(self.lastFeatureVector && [self.lastFeatureVector featureCount] && [featureVector featureCount] && ([self.lastFeatureVector featureCount] == [featureVector featureCount]))
     {
         dispatch_group_enter(calcGroup);
         
@@ -485,45 +478,6 @@
     standard = nil;
     frameMetadata = nil;
 }
-
-- (id) decodeSynopsisMetadataItem:(AVMetadataItem*)metadataItem
-{
-    
-    NSString* key = metadataItem.identifier;
-    
-    if([key isEqualToString:kSynopsislMetadataIdentifier])
-    {
-        // JSON
-        //                // Decode our metadata..
-        //                NSString* stringValue = (NSString*)metadataItem.value;
-        //                NSData* dataValue = [stringValue dataUsingEncoding:NSUTF8StringEncoding];
-        //                id decodedJSON = [NSJSONSerialization JSONObjectWithData:dataValue options:kNilOptions error:nil];
-        //                if(decodedJSON)
-        //                    [metadataDictionary setObject:decodedJSON forKey:key];
-        
-        //                // BSON:
-        //                NSData* zipped = (NSData*)metadataItem.value;
-        //                NSData* bsonData = [zipped gunzippedData];
-        //                NSDictionary* bsonDict = [NSDictionary dictionaryWithBSON:bsonData];
-        //                if(bsonDict)
-        //                    [metadataDictionary setObject:bsonDict forKey:key];
-        
-        // GZIP + JSON
-        NSData* zipped = (NSData*)metadataItem.value;
-        NSData* json = [zipped gunzippedData];
-        id decodedJSON = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:nil];
-        if(decodedJSON)
-        {
-            return decodedJSON;
-        }
-        
-        return nil;
-    }
-    
-    return nil;
-
-}
-
 
 
 @end
