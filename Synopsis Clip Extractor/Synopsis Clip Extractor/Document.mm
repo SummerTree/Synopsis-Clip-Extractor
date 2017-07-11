@@ -15,8 +15,6 @@
 
 @interface Document ()
 {
-    CMSimpleQueueRef compressedMetadataQueue;
-    CMSimpleQueueRef jsonMetadataQueue;
 }
 
 @property (weak) IBOutlet PlayerView* playerView;
@@ -28,11 +26,9 @@
 @property (strong) AVAssetReaderOutputMetadataAdaptor* clipAssetReaderMetadataAdaptor;
 @property (strong) SynopsisMetadataDecoder* metadataDecoder;
 
-@property (strong) dispatch_queue_t backgroundReadQueue;
-@property (strong) dispatch_queue_t backgroundDecompressionQueue;
-@property (strong) dispatch_queue_t backgroundJSONParseQueue;
-@property (strong) dispatch_queue_t backgroundCalculateQueue;
-
+@property (strong) NSOperationQueue* backgroundReadQueue;
+@property (strong) NSOperationQueue* backgroundJSONParseQueue;
+@property (strong) NSOperationQueue* backgroundCalculateQueue;
 
 @property (strong) NSMutableArray<NSArray<NSNumber*>*>* derivedMetadataInfo;
 @property (strong) NSMutableArray<NSValue*>* derivedMetadataTimeRanges;
@@ -54,28 +50,29 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Add your subclass-specific initialization here.
-        int32_t capacity = 64;
         
-        CMSimpleQueueCreate(kCFAllocatorDefault, capacity, &compressedMetadataQueue);
-        CMSimpleQueueCreate(kCFAllocatorDefault, capacity, &jsonMetadataQueue);
-        
-        self.backgroundReadQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundReadQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        self.backgroundDecompressionQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundDecompressionQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        self.backgroundJSONParseQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundJSONParseQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        self.backgroundCalculateQueue = dispatch_queue_create("info.synopsis.clip.extractor.backgroundCalculateQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
-        
+        self.backgroundReadQueue = [[NSOperationQueue alloc] init];
+        self.backgroundReadQueue.maxConcurrentOperationCount = 1;
+        self.backgroundReadQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+
+        self.backgroundJSONParseQueue = [[NSOperationQueue alloc] init];
+        self.backgroundJSONParseQueue.maxConcurrentOperationCount = NSOperationQueueDefaultMaxConcurrentOperationCount;
+        self.backgroundJSONParseQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+
+        self.backgroundCalculateQueue = [[NSOperationQueue alloc] init];
+        self.backgroundCalculateQueue.maxConcurrentOperationCount = 1;
+        self.backgroundCalculateQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+
         self.derivedMetadataTimeRanges = [NSMutableArray new];
         self.derivedMetadataInfo = [NSMutableArray new];
-    
     }
     return self;
 }
 
 - (void) dealloc
 {
-    CFRelease(compressedMetadataQueue);
-    CFRelease(jsonMetadataQueue);
+//    CFRelease(compressedMetadataQueue);
+//    CFRelease(jsonMetadataQueue);
 }
 
 + (BOOL)autosavesInPlace {
@@ -139,14 +136,10 @@
         CMTime currentTime = [[note.userInfo objectForKey:@"timelineTime"] CMTimeValue];
         [self.playerView setCurrentTime:currentTime];
     }];
-     
-//     [[NSNotificationCenter defaultCenter] postNotificationName:@"PlayerTime" object:self userInfo:@{@"timelineTime" : [NSValue valueWithCMTime:currentTimelineTime]} ];
-
     
     if(metadataAssetTrack)
     {
-        self.clipAssetReaderTrackOutput = [ AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:metadataAssetTrack outputSettings:nil];
-        
+        self.clipAssetReaderTrackOutput = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:metadataAssetTrack outputSettings:nil];
         self.clipAssetReaderTrackOutput.alwaysCopiesSampleData = NO;
         
         self.clipAssetReaderMetadataAdaptor = [AVAssetReaderOutputMetadataAdaptor assetReaderOutputMetadataAdaptorWithAssetReaderTrackOutput:self.clipAssetReaderTrackOutput];
@@ -177,29 +170,18 @@
     
     dispatch_group_t pipelineGroup = dispatch_group_create();
     
-    __block BOOL finishedReading = NO;
-    __block BOOL finishedDecompressing = NO;
-    __block BOOL finishedParsing = NO;
-    __block BOOL finishedCalculating = NO;
-    
-    useconds_t sleepTime = 1000;
-    
     // Read Thread
     dispatch_group_enter(pipelineGroup);
-    dispatch_async(weakSelf.backgroundReadQueue, ^{
+    
+    NSBlockOperation* readOperation = [[NSBlockOperation alloc] init];
+    readOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+    
+    [readOperation addExecutionBlock:^{
         
         while(weakSelf.clipAssetReader.status == AVAssetReaderStatusReading )
         {
             @autoreleasepool
             {
-                // At capacity?
-                if( CMSimpleQueueGetCount(compressedMetadataQueue) == CMSimpleQueueGetCapacity(compressedMetadataQueue) )
-                {
-//                    NSLog(@"CompressedMetadata Queue Full - Throttling");
-                    usleep(sleepTime);
-                    continue;
-                }
-                
                 AVTimedMetadataGroup* timedMetadata = [weakSelf.clipAssetReaderMetadataAdaptor nextTimedMetadataGroup];
                 if(timedMetadata)
                 {
@@ -210,151 +192,51 @@
                         if([key isEqualToString:kSynopsislMetadataIdentifier])
                         {
                             NSData* data = (NSData*)metadataItem.value;
-                            NSDictionary* dataAndTime = @{@"data" : data,
-                                                          @"timeRange" : [NSValue valueWithCMTimeRange:(timedMetadata.timeRange)]
-                                                          };
                             
-                            CFDictionaryRef cfDateAndTime = (CFDictionaryRef)CFBridgingRetain(dataAndTime);
-                            if(cfDateAndTime)
-                                CMSimpleQueueEnqueue(compressedMetadataQueue, cfDateAndTime);
+                            NSValue* timeRangeValue = [NSValue valueWithCMTimeRange:(timedMetadata.timeRange)];
+ 
+                            NSBlockOperation* jsonParseOperation = [[NSBlockOperation alloc] init];
+                            jsonParseOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+                            [jsonParseOperation addExecutionBlock:^{
+
+                                NSDictionary* frameMetadata = [weakSelf.metadataDecoder decodeSynopsisData:data];
+                                if(frameMetadata)
+                                {
+                                    NSBlockOperation* calculateOperation = [[NSBlockOperation alloc] init];
+                                    calculateOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+
+                                    [calculateOperation addExecutionBlock:^{
+                                        [weakSelf calculateFromMetadata:frameMetadata timeRangeValue:timeRangeValue];
+                                    }];
+
+                                    if(lastJSONReadOperation)
+                                    {
+                                        [calculateOperation addDependency:lastJSONReadOperation];
+                                    }
+
+                                    [weakSelf.backgroundCalculateQueue addOperation:calculateOperation];
+                                }
+                                
+                            }];
+
+                            [weakSelf.backgroundJSONParseQueue addOperation:jsonParseOperation];
                         }
                     }
                 }
                 else
                 {
-                    finishedReading = YES;
-                    dispatch_group_leave(pipelineGroup);
                     break;
                 }
             }
         }
-    });
+    }];
 
+    [weakSelf.backgroundReadQueue addOperation:readOperation];
     
-    dispatch_group_enter(pipelineGroup);
-    dispatch_async(weakSelf.backgroundJSONParseQueue, ^{
+    [self.backgroundReadQueue waitUntilAllOperationsAreFinished];
+    [self.backgroundJSONParseQueue waitUntilAllOperationsAreFinished];
+    [self.backgroundCalculateQueue waitUntilAllOperationsAreFinished];
 
-        // Parse Zipped Data to JSON on background queue
-        NSUInteger batchCount = [NSProcessInfo processInfo].processorCount;
-        NSLock* batchLock = [[NSLock alloc] init];
-        NSMutableArray* batchCache = [NSMutableArray arrayWithCapacity:batchCount];
-        dispatch_group_t batchGroup = dispatch_group_create();
-
-        while( ! finishedReading )
-        {
-            @autoreleasepool
-            {
-                // At capacity
-                if( CMSimpleQueueGetCount(jsonMetadataQueue) == CMSimpleQueueGetCapacity(jsonMetadataQueue) )
-                {
-//                    NSLog(@"JSONMetadata Queue Full - Throttling");
-                    usleep(sleepTime);
-                    continue;
-                }
-                
-                // Parallelize unzip and json parsing
-                __block int dataCount = 0;
-                for(int i = 0; i < batchCount; i++)
-                {
-                    CFDictionaryRef cfDataAndTime = (CFDictionaryRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
-                    
-                    if(cfDataAndTime)
-                    {
-                        dispatch_group_enter(batchGroup);
-                        
-                        dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INITIATED, 0), ^{
-                            
-                            @autoreleasepool
-                            {
-                                NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
-
-                                NSData* data = dataAndTime[@"data"];
-                                NSValue* timeRangeValue = dataAndTime[@"timeRange"];
-
-                                NSDictionary* frameMetadata = [self.metadataDecoder decodeSynopsisData:data];
-                                if(frameMetadata)
-                                {
-                                    // TODO: FIX ORDERING HERE:
-                                    [batchLock lock];
-                                    dataCount++;
-                                    //                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
-                                    [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
-                                    [batchLock unlock];
-                                }
-                                
-                                CFRelease(cfDataAndTime);
-                            }
-                            
-                            dispatch_group_leave(batchGroup);
-                        });
-                    }
-                }
-                
-                dispatch_group_wait(batchGroup, DISPATCH_TIME_FOREVER);
-
-                [batchLock lock];
-
-                for(int i = 0; i < batchCache.count; i++)
-                {
-                    NSDictionary* jsonAndTime = batchCache[i];
-                    
-                    if(jsonAndTime)
-                    {
-//                        dispatch_async(weakSelf.backgroundCalculateQueue, ^{
-//                            @autoreleasepool {
-                                [weakSelf calculateFromMetadata:jsonAndTime];
-//                            }
-//                        });
-
-                        jsonAndTime = nil;
-                    }
-                }
-                
-                [batchCache removeAllObjects];
-//                batchCache = [NSMutableArray arrayWithCapacity:batchCount];
-                [batchLock unlock];
-            }
-        }
-        
-        // unwind anything left in the SimpleQueue
-        while(  CMSimpleQueueGetCount(compressedMetadataQueue) > 0 )
-        {
-            // At capacity
-            if( CMSimpleQueueGetCount(jsonMetadataQueue) == CMSimpleQueueGetCapacity(jsonMetadataQueue) )
-            {
-//                NSLog(@"JSONMetadata Queue Full - Throttling");
-                usleep(sleepTime);
-                continue;
-            }
-
-            CFDictionaryRef cfDataAndTime = (CFDictionaryRef)(CMSimpleQueueDequeue(compressedMetadataQueue));
-            
-            if(cfDataAndTime)
-            {
-                NSDictionary* dataAndTime = (__bridge NSDictionary*)cfDataAndTime;
-                
-                NSData* data = dataAndTime[@"data"];
-                NSValue* timeRangeValue = dataAndTime[@"timeRange"];
-                
-                NSDictionary* frameMetadata = [self.metadataDecoder decodeSynopsisData:data];
-                if(frameMetadata)
-                {
-                    // TODO: FIX ORDERING HERE:
-                    [batchLock lock];
-                    //                                        [batchCache insertObject:frameMetadata atIndex:dataCount];
-                    [batchCache addObject:@{@"json" : frameMetadata, @"timeRange" : timeRangeValue}];
-                    [batchLock unlock];
-                }
-                CFRelease(cfDataAndTime);
-            }
-        }
-        
-        finishedParsing = YES;
-        dispatch_group_leave(pipelineGroup);
-    });
-    
-    
-    dispatch_group_wait(pipelineGroup, DISPATCH_TIME_FOREVER);
     NSLog(@"Finished");
     
     self.timelineView.interestingTimeRangesArray = self.derivedMetadataTimeRanges;
@@ -364,11 +246,8 @@
     
 }
 
-- (void) calculateFromMetadata:(NSDictionary*)jsonAndTimeRangeDict
+- (void) calculateFromMetadata:(NSDictionary*)frameMetadata timeRangeValue:(NSValue*)timeRange
 {
-    NSDictionary* frameMetadata = jsonAndTimeRangeDict[@"json"];
-    NSValue* timeRange = jsonAndTimeRangeDict[@"timeRange"];
-    
     [self.derivedMetadataTimeRanges addObject:timeRange];
         
     NSDictionary* standard = [frameMetadata objectForKey:kSynopsisStandardMetadataDictKey];
