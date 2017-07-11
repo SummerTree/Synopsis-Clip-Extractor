@@ -9,7 +9,6 @@
 #import "Document.h"
 #import <AVFoundation/AVFoundation.h>
 #import <Synopsis/Synopsis.h>
-#import <Synopsis/GZIP.h>
 #import "KeyframeView.h"
 #import "TimelineView.h"
 #import "PlayerView.h"
@@ -27,7 +26,7 @@
 @property (strong) AVAssetReader* clipAssetReader;
 @property (strong) AVAssetReaderTrackOutput* clipAssetReaderTrackOutput;
 @property (strong) AVAssetReaderOutputMetadataAdaptor* clipAssetReaderMetadataAdaptor;
-
+@property (strong) SynopsisMetadataDecoder* metadataDecoder;
 
 @property (strong) dispatch_queue_t backgroundReadQueue;
 @property (strong) dispatch_queue_t backgroundDecompressionQueue;
@@ -116,6 +115,7 @@
         
         self.clipAssetReader = [AVAssetReader assetReaderWithAsset:self.clipAsset error:nil];
         
+        self.metadataDecoder = [[SynopsisMetadataDecoder alloc] initWithVersion:SYNOPSIS_VERSION_NUMBER];
     }
 
     return self;
@@ -136,7 +136,7 @@
 
     [[NSNotificationCenter defaultCenter] addObserverForName:@"PlayerTime" object:self.timelineView queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note)
     {
-        CMTime currentTime = [[note.userInfo objectForKey:@"timelineTime"] CMTimeValue];;
+        CMTime currentTime = [[note.userInfo objectForKey:@"timelineTime"] CMTimeValue];
         [self.playerView setCurrentTime:currentTime];
     }];
      
@@ -169,7 +169,7 @@
 
 - (void) readOnBackgroundQueue
 {
-    id activityObject = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiated reason:@"Process Metadata"];
+    id activityObject = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiated | NSActivityLatencyCritical | NSActivityIdleSystemSleepDisabled reason:@"Process Metadata"];
   
     [self.clipAssetReader startReading];
     
@@ -271,7 +271,7 @@
                                 NSData* data = dataAndTime[@"data"];
                                 NSValue* timeRangeValue = dataAndTime[@"timeRange"];
 
-                                NSDictionary* frameMetadata = [SynopsisMetadataItem decodeSynopsisData:data];
+                                NSDictionary* frameMetadata = [self.metadataDecoder decodeSynopsisData:data];
                                 if(frameMetadata)
                                 {
                                     // TODO: FIX ORDERING HERE:
@@ -336,7 +336,7 @@
                 NSData* data = dataAndTime[@"data"];
                 NSValue* timeRangeValue = dataAndTime[@"timeRange"];
                 
-                NSDictionary* frameMetadata = [SynopsisMetadataItem decodeSynopsisData:data];
+                NSDictionary* frameMetadata = [self.metadataDecoder decodeSynopsisData:data];
                 if(frameMetadata)
                 {
                     // TODO: FIX ORDERING HERE:
