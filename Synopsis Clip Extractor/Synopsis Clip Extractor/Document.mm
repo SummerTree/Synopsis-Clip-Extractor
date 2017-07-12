@@ -209,11 +209,6 @@
                                         [weakSelf calculateFromMetadata:frameMetadata timeRangeValue:timeRangeValue];
                                     }];
 
-                                    if(lastJSONReadOperation)
-                                    {
-                                        [calculateOperation addDependency:lastJSONReadOperation];
-                                    }
-
                                     [weakSelf.backgroundCalculateQueue addOperation:calculateOperation];
                                 }
                                 
